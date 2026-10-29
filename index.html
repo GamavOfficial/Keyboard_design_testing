@@ -1,0 +1,1285 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Keyboard Customizer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0c0f17',
+                            800: '#151926',
+                            700: '#1f2538',
+                            600: '#2a324b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-mono-code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a324b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b476a;
+        }
+
+        /* Preset Animated Backgrounds */
+        .anim-rgb-wave {
+            background: linear-gradient(45deg, #ff0000, #ff7700, #ffeb00, #00ff00, #00aaff, #8a00ff, #ff0000);
+            background-size: 400% 400%;
+            animation: rgbWave 6s ease infinite;
+        }
+
+        @keyframes rgbWave {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .anim-cyber-grid {
+            background: linear-gradient(90deg, rgba(255,0,128,0.4) 1px, transparent 1px),
+                        linear-gradient(0deg, rgba(0,229,255,0.4) 1px, transparent 1px),
+                        #0a0a16;
+            background-size: 15px 15px;
+            animation: gridMove 4s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 15px 15px; }
+        }
+
+        .anim-matrix {
+            background: radial-gradient(circle, #003300 0%, #000500 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .anim-matrix::after {
+            content: "010101010101";
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            color: rgba(0, 255, 65, 0.25);
+            font-family: monospace;
+            font-size: 10px;
+            word-wrap: break-word;
+            animation: matrixRain 3s linear infinite;
+            line-height: 10px;
+            opacity: 0.6;
+        }
+
+        @keyframes matrixRain {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50%); }
+        }
+
+        .anim-neon-pulse {
+            background: #110022;
+            animation: neonPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            0% { background-color: #110022; box-shadow: inset 0 0 10px #ff007f; }
+            100% { background-color: #001122; box-shadow: inset 0 0 20px #00f0ff; }
+        }
+
+        /* Keyboard Key Styles Dynamic Layers */
+        .key-base {
+            position: relative;
+            transition: transform 0.05s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .key-base:active, .key-base.key-active {
+            transform: translateY(2px) scale(0.97) !important;
+        }
+
+        /* Dynamic Image / Video / Animation background overlay inside key */
+        .key-bg-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+
+        .key-bg-layer video, .key-bg-layer img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .key-content-layer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Hide Default Color Inputs */
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-slate-100 min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Top Header Navigation -->
+    <header class="border-b border-dark-700 bg-dark-800/80 backdrop-blur sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-indigo-600/30">
+                <i data-lucide="keyboard" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
+                    KeyCraft Studio 
+                    <span class="text-xs font-normal bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded-full">Pro Customizer</span>
+                </h1>
+                <p class="text-xs text-slate-400">Live Customization & Visual Preview Engine</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Presets -->
+        <div class="flex items-center gap-2">
+            <div class="hidden sm:flex items-center gap-1.5 mr-2 bg-dark-900 p-1 rounded-lg border border-dark-700">
+                <span class="text-xs text-slate-400 px-2">Presets:</span>
+                <button onclick="applyPreset('cyberpunk')" class="px-2.5 py-1 text-xs rounded bg-dark-700 hover:bg-pink-600/30 hover:text-pink-300 border border-transparent hover:border-pink-500/40 transition">Cyberpunk</button>
+                <button onclick="applyPreset('rgbGamer')" class="px-2.5 py-1 text-xs rounded bg-dark-700 hover:bg-cyan-600/30 hover:text-cyan-300 border border-transparent hover:border-cyan-500/40 transition">RGB Wave</button>
+                <button onclick="applyPreset('pastel')" class="px-2.5 py-1 text-xs rounded bg-dark-700 hover:bg-purple-600/30 hover:text-purple-300 border border-transparent hover:border-purple-500/40 transition">Pastel</button>
+                <button onclick="applyPreset('minimal')" class="px-2.5 py-1 text-xs rounded bg-dark-700 hover:bg-slate-600/30 hover:text-slate-300 border border-transparent hover:border-slate-500/40 transition">Minimal</button>
+            </div>
+
+            <button onclick="exportConfig()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-dark-700 hover:bg-dark-600 rounded-lg border border-dark-600 transition">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">Export</span>
+            </button>
+
+            <label class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-dark-700 hover:bg-dark-600 rounded-lg border border-dark-600 cursor-pointer transition">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">Import</span>
+                <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importConfig(event)">
+            </label>
+
+            <button onclick="resetToDefault()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg transition" title="Reset All Settings">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Split Screen -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- LEFT PANEL: Controls / Settings -->
+        <aside class="w-full lg:w-[420px] xl:w-[460px] border-r border-dark-700 bg-dark-800/50 flex flex-col h-auto lg:h-[calc(100vh-61px)]">
+            
+            <!-- Tab Selection -->
+            <div class="flex border-b border-dark-700 bg-dark-900/60 p-1.5 gap-1.5">
+                <button id="tab-btn-letters" onclick="switchTab('letters')" class="flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 bg-indigo-600 text-white shadow transition">
+                    <i data-lucide="type" class="w-4 h-4"></i>
+                    <span>Letters Keys</span>
+                </button>
+                <button id="tab-btn-special" onclick="switchTab('special')" class="flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 bg-dark-800 text-slate-400 hover:text-slate-200 hover:bg-dark-700 transition">
+                    <i data-lucide="command" class="w-4 h-4"></i>
+                    <span>Special Keys</span>
+                </button>
+            </div>
+
+            <!-- Scrollable Settings Body -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+
+                <!-- Tamil / English Help Tooltip Banner -->
+                <div class="bg-indigo-950/40 border border-indigo-500/20 rounded-xl p-3 text-xs text-indigo-300 flex items-start gap-2.5">
+                    <i data-lucide="info" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-medium text-indigo-200">Independent Styling Active / தனித்தனி கட்டுப்பாடு</p>
+                        <p class="text-indigo-300/80 mt-0.5">Letters and Special keys operate completely independently. Image/Animation backgrounds preserve border, text, and glow effects!</p>
+                    </div>
+                </div>
+
+                <!-- FORM: LETTERS KEYS SETTINGS -->
+                <div id="panel-letters" class="space-y-6">
+                    <div class="flex items-center justify-between pb-2 border-b border-dark-700">
+                        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            Letters Keys Customization
+                        </h3>
+                        <span class="text-[10px] bg-dark-700 text-slate-400 px-2 py-0.5 rounded">A-Z, 0-9, Symbols</span>
+                    </div>
+
+                    <!-- Background Type Switcher -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-medium text-slate-300">Background Type / பின்புல வகை</label>
+                        <div class="grid grid-cols-3 gap-2 bg-dark-900 p-1 rounded-xl border border-dark-700">
+                            <button type="button" onclick="setBgMode('letters', 'color')" id="letters-bg-mode-color" class="py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white transition">Color</button>
+                            <button type="button" onclick="setBgMode('letters', 'image')" id="letters-bg-mode-image" class="py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition">Image</button>
+                            <button type="button" onclick="setBgMode('letters', 'animation')" id="letters-bg-mode-animation" class="py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition">Animation</button>
+                        </div>
+                    </div>
+
+                    <!-- Background Dynamic Controls -->
+                    <!-- Color Mode -->
+                    <div id="letters-ctrl-color" class="space-y-2">
+                        <label class="text-xs font-medium text-slate-300 flex justify-between">
+                            <span>Background Color</span>
+                            <span id="letters-bgColor-val" class="text-slate-400 font-mono-code">#1e293b</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="color" id="letters-bgColor" value="#1e293b" oninput="updateConfig('letters', 'bgColor', this.value)" class="w-10 h-9 bg-dark-900 border border-dark-700 rounded-lg cursor-pointer shrink-0">
+                            <input type="text" id="letters-bgColor-hex" value="#1e293b" oninput="updateConfig('letters', 'bgColor', this.value)" class="flex-1 bg-dark-900 border border-dark-700 rounded-lg px-3 text-xs font-mono-code focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- Image Mode -->
+                    <div id="letters-ctrl-image" class="space-y-2 hidden">
+                        <label class="text-xs font-medium text-slate-300">Upload Image (PNG, JPG, WebP)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="letters-img-file" accept="image/png, image/jpeg, image/webp" onchange="handleFileUpload('letters', 'image', this)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer bg-dark-900 border border-dark-700 rounded-lg">
+                            <button onclick="clearMedia('letters')" class="p-2 bg-dark-700 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg text-slate-400 transition" title="Clear Image">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div id="letters-img-preview" class="hidden text-[11px] text-emerald-400 flex items-center gap-1.5 mt-1">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Custom image uploaded!
+                        </div>
+                    </div>
+
+                    <!-- Animation Mode -->
+                    <div id="letters-ctrl-animation" class="space-y-3 hidden">
+                        <label class="text-xs font-medium text-slate-300">Preset Animations or Upload GIF/Video</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setPresetAnim('letters', 'rgb-wave')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-indigo-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full anim-rgb-wave inline-block"></span> RGB Wave
+                            </button>
+                            <button onclick="setPresetAnim('letters', 'cyber-grid')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-indigo-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full anim-cyber-grid inline-block"></span> Cyber Grid
+                            </button>
+                            <button onclick="setPresetAnim('letters', 'matrix')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-indigo-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-900 inline-block"></span> Matrix Rain
+                            </button>
+                            <button onclick="setPresetAnim('letters', 'neon-pulse')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-indigo-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full anim-neon-pulse inline-block"></span> Neon Pulse
+                            </button>
+                        </div>
+                        <div class="pt-1">
+                            <label class="text-[11px] text-slate-400 block mb-1">Custom Animated GIF / Video</label>
+                            <div class="flex items-center gap-2">
+                                <input type="file" id="letters-anim-file" accept="image/gif, video/mp4, video/webm" onchange="handleFileUpload('letters', 'animation', this)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer bg-dark-900 border border-dark-700 rounded-lg">
+                                <button onclick="clearMedia('letters')" class="p-2 bg-dark-700 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg text-slate-400 transition" title="Clear Animation">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-dark-700 pt-4 space-y-4">
+                        <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Styling & Effects Settings</h4>
+
+                        <!-- Text Color -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-300">Text Color</span>
+                                <span id="letters-textColor-val" class="text-slate-400 font-mono-code">#f8fafc</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="color" id="letters-textColor" value="#f8fafc" oninput="updateConfig('letters', 'textColor', this.value)" class="w-8 h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer shrink-0">
+                                <input type="text" id="letters-textColor-hex" value="#f8fafc" oninput="updateConfig('letters', 'textColor', this.value)" class="flex-1 bg-dark-900 border border-dark-700 rounded px-2.5 text-xs font-mono-code focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <!-- Border Color & Width -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Border Color</span>
+                                <input type="color" id="letters-borderColor" value="#3b82f6" oninput="updateConfig('letters', 'borderColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Border Width</span>
+                                    <span id="letters-borderWidth-val" class="text-slate-400 font-mono-code">1 px</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('letters-borderWidth', -1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="letters-borderWidth" min="0" max="10" value="1" oninput="updateConfig('letters', 'borderWidth', this.value)" class="w-full accent-indigo-500">
+                                    <button onclick="stepSlider('letters-borderWidth', 1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stroke Color & Width -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Stroke Color</span>
+                                <input type="color" id="letters-strokeColor" value="#60a5fa" oninput="updateConfig('letters', 'strokeColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Stroke Width</span>
+                                    <span id="letters-strokeWidth-val" class="text-slate-400 font-mono-code">1 px</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('letters-strokeWidth', -1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="letters-strokeWidth" min="0" max="10" value="1" oninput="updateConfig('letters', 'strokeWidth', this.value)" class="w-full accent-indigo-500">
+                                    <button onclick="stepSlider('letters-strokeWidth', 1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shadow Color & Blur -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Shadow Color</span>
+                                <input type="color" id="letters-shadowColor" value="#000000" oninput="updateConfig('letters', 'shadowColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Shadow Blur</span>
+                                    <span id="letters-shadowBlur-val" class="text-slate-400 font-mono-code">12 px</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('letters-shadowBlur', -1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="letters-shadowBlur" min="0" max="50" value="12" oninput="updateConfig('letters', 'shadowBlur', this.value)" class="w-full accent-indigo-500">
+                                    <button onclick="stepSlider('letters-shadowBlur', 1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Glow Color & Intensity -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Glow Color</span>
+                                <input type="color" id="letters-glowColor" value="#3b82f6" oninput="updateConfig('letters', 'glowColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Glow Intensity</span>
+                                    <span id="letters-glowIntensity-val" class="text-slate-400 font-mono-code">50%</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('letters-glowIntensity', -5)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="letters-glowIntensity" min="0" max="100" value="50" oninput="updateConfig('letters', 'glowIntensity', this.value)" class="w-full accent-indigo-500">
+                                    <button onclick="stepSlider('letters-glowIntensity', 5)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- FORM: SPECIAL KEYS SETTINGS -->
+                <div id="panel-special" class="space-y-6 hidden">
+                    <div class="flex items-center justify-between pb-2 border-b border-dark-700">
+                        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+                            Special Keys Customization
+                        </h3>
+                        <span class="text-[10px] bg-dark-700 text-slate-400 px-2 py-0.5 rounded">Shift, Enter, Space, Caps, Tab</span>
+                    </div>
+
+                    <!-- Background Type Switcher -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-medium text-slate-300">Background Type / பின்புல வகை</label>
+                        <div class="grid grid-cols-3 gap-2 bg-dark-900 p-1 rounded-xl border border-dark-700">
+                            <button type="button" onclick="setBgMode('special', 'color')" id="special-bg-mode-color" class="py-1.5 rounded-lg text-xs font-medium bg-pink-600 text-white transition">Color</button>
+                            <button type="button" onclick="setBgMode('special', 'image')" id="special-bg-mode-image" class="py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition">Image</button>
+                            <button type="button" onclick="setBgMode('special', 'animation')" id="special-bg-mode-animation" class="py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition">Animation</button>
+                        </div>
+                    </div>
+
+                    <!-- Background Dynamic Controls -->
+                    <!-- Color Mode -->
+                    <div id="special-ctrl-color" class="space-y-2">
+                        <label class="text-xs font-medium text-slate-300 flex justify-between">
+                            <span>Background Color</span>
+                            <span id="special-bgColor-val" class="text-slate-400 font-mono-code">#331832</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="color" id="special-bgColor" value="#331832" oninput="updateConfig('special', 'bgColor', this.value)" class="w-10 h-9 bg-dark-900 border border-dark-700 rounded-lg cursor-pointer shrink-0">
+                            <input type="text" id="special-bgColor-hex" value="#331832" oninput="updateConfig('special', 'bgColor', this.value)" class="flex-1 bg-dark-900 border border-dark-700 rounded-lg px-3 text-xs font-mono-code focus:outline-none focus:border-pink-500">
+                        </div>
+                    </div>
+
+                    <!-- Image Mode -->
+                    <div id="special-ctrl-image" class="space-y-2 hidden">
+                        <label class="text-xs font-medium text-slate-300">Upload Image (PNG, JPG, WebP)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="special-img-file" accept="image/png, image/jpeg, image/webp" onchange="handleFileUpload('special', 'image', this)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-500 cursor-pointer bg-dark-900 border border-dark-700 rounded-lg">
+                            <button onclick="clearMedia('special')" class="p-2 bg-dark-700 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg text-slate-400 transition" title="Clear Image">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div id="special-img-preview" class="hidden text-[11px] text-emerald-400 flex items-center gap-1.5 mt-1">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Custom image uploaded!
+                        </div>
+                    </div>
+
+                    <!-- Animation Mode -->
+                    <div id="special-ctrl-animation" class="space-y-3 hidden">
+                        <label class="text-xs font-medium text-slate-300">Preset Animations or Upload GIF/Video</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setPresetAnim('special', 'rgb-wave')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-pink-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full anim-rgb-wave inline-block"></span> RGB Wave
+                            </button>
+                            <button onclick="setPresetAnim('special', 'cyber-grid')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-pink-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full anim-cyber-grid inline-block"></span> Cyber Grid
+                            </button>
+                            <button onclick="setPresetAnim('special', 'matrix')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-pink-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-900 inline-block"></span> Matrix Rain
+                            </button>
+                            <button onclick="setPresetAnim('special', 'neon-pulse')" class="p-2 border border-dark-700 rounded-lg text-left text-xs bg-dark-900 hover:border-pink-500 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full anim-neon-pulse inline-block"></span> Neon Pulse
+                            </button>
+                        </div>
+                        <div class="pt-1">
+                            <label class="text-[11px] text-slate-400 block mb-1">Custom Animated GIF / Video</label>
+                            <div class="flex items-center gap-2">
+                                <input type="file" id="special-anim-file" accept="image/gif, video/mp4, video/webm" onchange="handleFileUpload('special', 'animation', this)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-500 cursor-pointer bg-dark-900 border border-dark-700 rounded-lg">
+                                <button onclick="clearMedia('special')" class="p-2 bg-dark-700 hover:bg-rose-500/20 hover:text-rose-400 rounded-lg text-slate-400 transition" title="Clear Animation">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-dark-700 pt-4 space-y-4">
+                        <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Styling & Effects Settings</h4>
+
+                        <!-- Text Color -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-300">Text Color</span>
+                                <span id="special-textColor-val" class="text-slate-400 font-mono-code">#f8fafc</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="color" id="special-textColor" value="#f8fafc" oninput="updateConfig('special', 'textColor', this.value)" class="w-8 h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer shrink-0">
+                                <input type="text" id="special-textColor-hex" value="#f8fafc" oninput="updateConfig('special', 'textColor', this.value)" class="flex-1 bg-dark-900 border border-dark-700 rounded px-2.5 text-xs font-mono-code focus:outline-none focus:border-pink-500">
+                            </div>
+                        </div>
+
+                        <!-- Icon Color -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-300">Icon Color / ஐகான் நிறம்</span>
+                                <span id="special-iconColor-val" class="text-slate-400 font-mono-code">#ec4899</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="color" id="special-iconColor" value="#ec4899" oninput="updateConfig('special', 'iconColor', this.value)" class="w-8 h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer shrink-0">
+                                <input type="text" id="special-iconColor-hex" value="#ec4899" oninput="updateConfig('special', 'iconColor', this.value)" class="flex-1 bg-dark-900 border border-dark-700 rounded px-2.5 text-xs font-mono-code focus:outline-none focus:border-pink-500">
+                            </div>
+                        </div>
+
+                        <!-- Border Color & Width -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Border Color</span>
+                                <input type="color" id="special-borderColor" value="#ec4899" oninput="updateConfig('special', 'borderColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Border Width</span>
+                                    <span id="special-borderWidth-val" class="text-slate-400 font-mono-code">1 px</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('special-borderWidth', -1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="special-borderWidth" min="0" max="10" value="1" oninput="updateConfig('special', 'borderWidth', this.value)" class="w-full accent-pink-500">
+                                    <button onclick="stepSlider('special-borderWidth', 1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stroke Color & Width -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Stroke Color</span>
+                                <input type="color" id="special-strokeColor" value="#f472b6" oninput="updateConfig('special', 'strokeColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Stroke Width</span>
+                                    <span id="special-strokeWidth-val" class="text-slate-400 font-mono-code">1 px</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('special-strokeWidth', -1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="special-strokeWidth" min="0" max="10" value="1" oninput="updateConfig('special', 'strokeWidth', this.value)" class="w-full accent-pink-500">
+                                    <button onclick="stepSlider('special-strokeWidth', 1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shadow Color & Blur -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Shadow Color</span>
+                                <input type="color" id="special-shadowColor" value="#000000" oninput="updateConfig('special', 'shadowColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Shadow Blur</span>
+                                    <span id="special-shadowBlur-val" class="text-slate-400 font-mono-code">12 px</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('special-shadowBlur', -1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="special-shadowBlur" min="0" max="50" value="12" oninput="updateConfig('special', 'shadowBlur', this.value)" class="w-full accent-pink-500">
+                                    <button onclick="stepSlider('special-shadowBlur', 1)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Glow Color & Intensity -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs text-slate-300 block">Glow Color</span>
+                                <input type="color" id="special-glowColor" value="#ec4899" oninput="updateConfig('special', 'glowColor', this.value)" class="w-full h-8 bg-dark-900 border border-dark-700 rounded cursor-pointer">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-slate-300">Glow Intensity</span>
+                                    <span id="special-glowIntensity-val" class="text-slate-400 font-mono-code">50%</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 pt-1">
+                                    <button onclick="stepSlider('special-glowIntensity', -5)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">-</button>
+                                    <input type="range" id="special-glowIntensity" min="0" max="100" value="50" oninput="updateConfig('special', 'glowIntensity', this.value)" class="w-full accent-pink-500">
+                                    <button onclick="stepSlider('special-glowIntensity', 5)" class="w-6 h-6 rounded bg-dark-700 text-xs font-bold hover:bg-dark-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL: Live Interactive Preview -->
+        <main class="flex-1 bg-dark-900 flex flex-col p-4 md:p-6 lg:p-8 overflow-y-auto justify-between">
+            
+            <!-- Live Type Testing Area -->
+            <div class="w-full max-w-4xl mx-auto space-y-3 mb-6">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i> Live Type Test Field / தட்டச்சு சோதனை
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleAudio()" id="audio-toggle-btn" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 bg-dark-800 border border-dark-700 px-2.5 py-1 rounded-lg">
+                            <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400"></i> Sound FX: <span id="sound-status">ON</span>
+                        </button>
+                        <button onclick="clearTestField()" class="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1 bg-dark-800 border border-dark-700 px-2.5 py-1 rounded-lg">
+                            <i data-lucide="eraser" class="w-3.5 h-3.5"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <input type="text" id="type-test-input" placeholder="Type on your keyboard or click virtual keys below to test..." class="w-full bg-dark-800 border border-dark-700 rounded-xl px-4 py-3 text-sm font-mono-code text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 shadow-inner">
+                    <div id="caps-indicator" class="hidden absolute right-3 top-3 text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded">
+                        CAPS LOCK
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual Keyboard Housing Structure -->
+            <div class="w-full max-w-5xl mx-auto my-auto p-4 md:p-6 bg-dark-800/80 border border-dark-700/80 rounded-2xl shadow-2xl backdrop-blur relative">
+                
+                <!-- Brand Badge / Case Detailing -->
+                <div class="flex items-center justify-between mb-4 px-1">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span class="text-xs font-mono-code text-slate-400">CUSTOM KEYBOARD v2.4</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-dark-600"></span>
+                        <span class="w-2 h-2 rounded-full bg-dark-600"></span>
+                        <span class="w-2 h-2 rounded-full bg-dark-600"></span>
+                    </div>
+                </div>
+
+                <!-- Complete Virtual QWERTY Keyboard Layout -->
+                <div class="keyboard-grid flex flex-col gap-2 w-full text-xs font-medium select-none">
+                    
+                    <!-- Row 1: Function / Numbers -->
+                    <div class="flex gap-1.5 w-full">
+                        <button data-key="`" class="key-base letter-key h-12 flex-1 rounded-lg">~ `</button>
+                        <button data-key="1" class="key-base letter-key h-12 flex-1 rounded-lg">1</button>
+                        <button data-key="2" class="key-base letter-key h-12 flex-1 rounded-lg">2</button>
+                        <button data-key="3" class="key-base letter-key h-12 flex-1 rounded-lg">3</button>
+                        <button data-key="4" class="key-base letter-key h-12 flex-1 rounded-lg">4</button>
+                        <button data-key="5" class="key-base letter-key h-12 flex-1 rounded-lg">5</button>
+                        <button data-key="6" class="key-base letter-key h-12 flex-1 rounded-lg">6</button>
+                        <button data-key="7" class="key-base letter-key h-12 flex-1 rounded-lg">7</button>
+                        <button data-key="8" class="key-base letter-key h-12 flex-1 rounded-lg">8</button>
+                        <button data-key="9" class="key-base letter-key h-12 flex-1 rounded-lg">9</button>
+                        <button data-key="0" class="key-base letter-key h-12 flex-1 rounded-lg">0</button>
+                        <button data-key="-" class="key-base letter-key h-12 flex-1 rounded-lg">-</button>
+                        <button data-key="=" class="key-base letter-key h-12 flex-1 rounded-lg">=</button>
+                        <button data-key="Backspace" class="key-base special-key h-12 flex-[2] rounded-lg font-bold flex items-center justify-center gap-1">
+                            <i data-lucide="delete" class="w-4 h-4 key-icon"></i>
+                            <span class="hidden sm:inline">Backspace</span>
+                        </button>
+                    </div>
+
+                    <!-- Row 2: QWERTY -->
+                    <div class="flex gap-1.5 w-full">
+                        <button data-key="Tab" class="key-base special-key h-12 flex-[1.5] rounded-lg font-bold flex items-center justify-center gap-1">
+                            <i data-lucide="arrow-right-left" class="w-4 h-4 key-icon"></i>
+                            <span class="hidden sm:inline">Tab</span>
+                        </button>
+                        <button data-key="q" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">Q</button>
+                        <button data-key="w" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">W</button>
+                        <button data-key="e" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">E</button>
+                        <button data-key="r" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">R</button>
+                        <button data-key="t" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">T</button>
+                        <button data-key="y" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">Y</button>
+                        <button data-key="u" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">U</button>
+                        <button data-key="i" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">I</button>
+                        <button data-key="o" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">O</button>
+                        <button data-key="p" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">P</button>
+                        <button data-key="[" class="key-base letter-key h-12 flex-1 rounded-lg">[</button>
+                        <button data-key="]" class="key-base letter-key h-12 flex-1 rounded-lg">]</button>
+                        <button data-key="\" class="key-base letter-key h-12 flex-1 rounded-lg">\</button>
+                    </div>
+
+                    <!-- Row 3: ASDFGH -->
+                    <div class="flex gap-1.5 w-full">
+                        <button data-key="CapsLock" class="key-base special-key h-12 flex-[1.8] rounded-lg font-bold flex items-center justify-center gap-1">
+                            <i data-lucide="lock" class="w-4 h-4 key-icon"></i>
+                            <span class="hidden sm:inline">Caps Lock</span>
+                        </button>
+                        <button data-key="a" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">A</button>
+                        <button data-key="s" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">S</button>
+                        <button data-key="d" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">D</button>
+                        <button data-key="f" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">F</button>
+                        <button data-key="g" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">G</button>
+                        <button data-key="h" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">H</button>
+                        <button data-key="j" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">J</button>
+                        <button data-key="k" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">K</button>
+                        <button data-key="l" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">L</button>
+                        <button data-key=";" class="key-base letter-key h-12 flex-1 rounded-lg">;</button>
+                        <button data-key="'" class="key-base letter-key h-12 flex-1 rounded-lg">'</button>
+                        <button data-key="Enter" class="key-base special-key h-12 flex-[2.2] rounded-lg font-bold flex items-center justify-center gap-1">
+                            <i data-lucide="corner-down-left" class="w-4 h-4 key-icon"></i>
+                            <span class="hidden sm:inline">Enter</span>
+                        </button>
+                    </div>
+
+                    <!-- Row 4: ZXCVBN -->
+                    <div class="flex gap-1.5 w-full">
+                        <button data-key="ShiftLeft" class="key-base special-key h-12 flex-[2.3] rounded-lg font-bold flex items-center justify-center gap-1">
+                            <i data-lucide="arrow-big-up" class="w-4 h-4 key-icon"></i>
+                            <span class="hidden sm:inline">Shift</span>
+                        </button>
+                        <button data-key="z" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">Z</button>
+                        <button data-key="x" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">X</button>
+                        <button data-key="c" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">C</button>
+                        <button data-key="v" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">V</button>
+                        <button data-key="b" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">B</button>
+                        <button data-key="n" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">N</button>
+                        <button data-key="m" class="key-base letter-key h-12 flex-1 rounded-lg uppercase">M</button>
+                        <button data-key="," class="key-base letter-key h-12 flex-1 rounded-lg">,</button>
+                        <button data-key="." class="key-base letter-key h-12 flex-1 rounded-lg">.</button>
+                        <button data-key="/" class="key-base letter-key h-12 flex-1 rounded-lg">/</button>
+                        <button data-key="ShiftRight" class="key-base special-key h-12 flex-[2.3] rounded-lg font-bold flex items-center justify-center gap-1">
+                            <i data-lucide="arrow-big-up" class="w-4 h-4 key-icon"></i>
+                            <span class="hidden sm:inline">Shift</span>
+                        </button>
+                    </div>
+
+                    <!-- Row 5: Space & Modifiers -->
+                    <div class="flex gap-1.5 w-full">
+                        <button data-key="ControlLeft" class="key-base special-key h-12 flex-1 rounded-lg font-bold">Ctrl</button>
+                        <button data-key="MetaLeft" class="key-base special-key h-12 flex-1 rounded-lg font-bold flex items-center justify-center">
+                            <i data-lucide="command" class="w-4 h-4 key-icon"></i>
+                        </button>
+                        <button data-key="AltLeft" class="key-base special-key h-12 flex-1 rounded-lg font-bold">Alt</button>
+                        <button data-key=" " class="key-base special-key h-12 flex-[6] rounded-lg font-bold">Space</button>
+                        <button data-key="AltRight" class="key-base special-key h-12 flex-1 rounded-lg font-bold">Alt</button>
+                        <button data-key="MetaRight" class="key-base special-key h-12 flex-1 rounded-lg font-bold flex items-center justify-center">
+                            <i data-lucide="settings" class="w-4 h-4 key-icon"></i>
+                        </button>
+                        <button data-key="ControlRight" class="key-base special-key h-12 flex-1 rounded-lg font-bold">Ctrl</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Stats / Info -->
+            <div class="mt-6 text-center text-xs text-slate-500">
+                <span>Designed for high performance keyboard customization. Real-time DOM CSS Variables rendering.</span>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Default Configuration Object for Letters and Special Keys
+        const defaultConfig = {
+            letters: {
+                bgMode: 'color', // 'color' | 'image' | 'animation'
+                bgColor: '#1e293b',
+                mediaUrl: '', // base64 or blob url
+                mediaType: '', // 'image' | 'gif' | 'video'
+                presetAnim: 'rgb-wave',
+                textColor: '#f8fafc',
+                borderColor: '#3b82f6',
+                borderWidth: 1,
+                strokeColor: '#60a5fa',
+                strokeWidth: 1,
+                shadowColor: '#000000',
+                shadowBlur: 12,
+                glowColor: '#3b82f6',
+                glowIntensity: 50
+            },
+            special: {
+                bgMode: 'color',
+                bgColor: '#331832',
+                mediaUrl: '',
+                mediaType: '',
+                presetAnim: 'neon-pulse',
+                textColor: '#f8fafc',
+                iconColor: '#ec4899',
+                borderColor: '#ec4899',
+                borderWidth: 1,
+                strokeColor: '#f472b6',
+                strokeWidth: 1,
+                shadowColor: '#000000',
+                shadowBlur: 12,
+                glowColor: '#ec4899',
+                glowIntensity: 50
+            }
+        };
+
+        // Active Application State
+        let config = JSON.parse(JSON.stringify(defaultConfig));
+        let soundEnabled = true;
+        let activeTab = 'letters';
+
+        // Web Audio API Sound Synthesizer for Mechanical Keyboard Click
+        let audioCtx = null;
+
+        function playKeySound() {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.04);
+                
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch(e) {}
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-status').textContent = soundEnabled ? 'ON' : 'OFF';
+        }
+
+        // Initialize Lucide Icons & Key Structure
+        window.onload = function() {
+            lucide.createIcons();
+            wrapKeyContents();
+            applyAllStyles();
+            setupEventListeners();
+        };
+
+        // Wrap Key inner text/icon inside proper layers for precise background positioning
+        function wrapKeyContents() {
+            const keys = document.querySelectorAll('.key-base');
+            keys.forEach(key => {
+                const html = key.innerHTML;
+                key.innerHTML = `
+                    <div class="key-bg-layer"></div>
+                    <div class="key-content-layer">${html}</div>
+                `;
+            });
+        }
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            activeTab = tab;
+            const lettersTabBtn = document.getElementById('tab-btn-letters');
+            const specialTabBtn = document.getElementById('tab-btn-special');
+            const lettersPanel = document.getElementById('panel-letters');
+            const specialPanel = document.getElementById('panel-special');
+
+            if (tab === 'letters') {
+                lettersTabBtn.className = "flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 bg-indigo-600 text-white shadow transition";
+                specialTabBtn.className = "flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 bg-dark-800 text-slate-400 hover:text-slate-200 hover:bg-dark-700 transition";
+                lettersPanel.classList.remove('hidden');
+                specialPanel.classList.add('hidden');
+            } else {
+                specialTabBtn.className = "flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 bg-pink-600 text-white shadow transition";
+                lettersTabBtn.className = "flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 bg-dark-800 text-slate-400 hover:text-slate-200 hover:bg-dark-700 transition";
+                specialPanel.classList.remove('hidden');
+                lettersPanel.classList.add('hidden');
+            }
+        }
+
+        // Background Mode Switcher (Color | Image | Animation)
+        function setBgMode(target, mode) {
+            config[target].bgMode = mode;
+
+            // UI Buttons Update
+            const activeClass = target === 'letters' ? 'bg-indigo-600 text-white' : 'bg-pink-600 text-white';
+            const inactiveClass = 'text-slate-400 hover:text-slate-200';
+
+            ['color', 'image', 'animation'].forEach(m => {
+                const btn = document.getElementById(`${target}-bg-mode-${m}`);
+                if (m === mode) {
+                    btn.className = `py-1.5 rounded-lg text-xs font-medium ${activeClass} transition`;
+                } else {
+                    btn.className = `py-1.5 rounded-lg text-xs font-medium ${inactiveClass} transition`;
+                }
+            });
+
+            // Visibility Rules for Controls
+            const colorCtrl = document.getElementById(`${target}-ctrl-color`);
+            const imageCtrl = document.getElementById(`${target}-ctrl-image`);
+            const animCtrl = document.getElementById(`${target}-ctrl-animation`);
+
+            colorCtrl.classList.toggle('hidden', mode !== 'color');
+            imageCtrl.classList.toggle('hidden', mode !== 'image');
+            animCtrl.classList.toggle('hidden', mode !== 'animation');
+
+            applyStylesForCategory(target);
+        }
+
+        // Update Slider Value and Config
+        function updateConfig(target, key, value) {
+            config[target][key] = value;
+
+            // Update Value Displays
+            const displayEl = document.getElementById(`${target}-${key}-val`);
+            if (displayEl) {
+                if (key.includes('Blur') || key.includes('Width')) {
+                    displayEl.textContent = `${value} px`;
+                } else if (key.includes('Intensity')) {
+                    displayEl.textContent = `${value}%`;
+                } else {
+                    displayEl.textContent = value;
+                }
+            }
+
+            // Sync Hex Input if color
+            const hexEl = document.getElementById(`${target}-${key}-hex`);
+            if (hexEl && hexEl.value !== value) hexEl.value = value;
+
+            const colorEl = document.getElementById(`${target}-${key}`);
+            if (colorEl && colorEl.value !== value && colorEl.type === 'color') colorEl.value = value;
+
+            applyStylesForCategory(target);
+        }
+
+        // Step Slider Buttons
+        function stepSlider(id, step) {
+            const slider = document.getElementById(id);
+            if (!slider) return;
+            let val = parseInt(slider.value) + step;
+            val = Math.max(parseInt(slider.min), Math.min(parseInt(slider.max), val));
+            slider.value = val;
+            
+            const parts = id.split('-');
+            updateConfig(parts[0], parts[1], val);
+        }
+
+        // Handle Image / Animation File Upload
+        function handleFileUpload(target, mode, input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                config[target].mediaUrl = e.target.result;
+                if (file.type.startsWith('video/')) {
+                    config[target].mediaType = 'video';
+                } else if (file.type === 'image/gif') {
+                    config[target].mediaType = 'gif';
+                } else {
+                    config[target].mediaType = 'image';
+                }
+
+                const preview = document.getElementById(`${target}-img-preview`);
+                if (preview) preview.classList.remove('hidden');
+
+                applyStylesForCategory(target);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Set Preset Animation
+        function setPresetAnim(target, animName) {
+            config[target].presetAnim = animName;
+            config[target].mediaUrl = ''; // Clear custom upload if preset clicked
+            applyStylesForCategory(target);
+        }
+
+        // Clear Uploaded Media
+        function clearMedia(target) {
+            config[target].mediaUrl = '';
+            config[target].mediaType = '';
+            document.getElementById(`${target}-img-file`).value = '';
+            document.getElementById(`${target}-anim-file`).value = '';
+            const preview = document.getElementById(`${target}-img-preview`);
+            if (preview) preview.classList.add('hidden');
+            applyStylesForCategory(target);
+        }
+
+        // Apply Styles to Keyboard Elements (Letters or Special)
+        function applyStylesForCategory(category) {
+            const settings = config[category];
+            const selector = category === 'letters' ? '.letter-key' : '.special-key';
+            const elements = document.querySelectorAll(selector);
+
+            elements.forEach(key => {
+                const bgLayer = key.querySelector('.key-bg-layer');
+                const contentLayer = key.querySelector('.key-content-layer');
+                const icons = key.querySelectorAll('.key-icon');
+
+                // 1. Text & Icon Colors
+                key.style.color = settings.textColor;
+                icons.forEach(icon => {
+                    if (category === 'special' && settings.iconColor) {
+                        icon.style.color = settings.iconColor;
+                    } else {
+                        icon.style.color = settings.textColor;
+                    }
+                });
+
+                // 2. Borders & Strokes
+                key.style.borderColor = settings.borderColor;
+                key.style.borderWidth = `${settings.borderWidth}px`;
+                key.style.borderStyle = settings.borderWidth > 0 ? 'solid' : 'none';
+
+                // Text Stroke effect
+                if (settings.strokeWidth > 0) {
+                    key.style.webkitTextStroke = `${settings.strokeWidth}px ${settings.strokeColor}`;
+                } else {
+                    key.style.webkitTextStroke = '0px transparent';
+                }
+
+                // 3. Shadow & Glow Effects
+                const glowAlpha = settings.glowIntensity / 100;
+                const glowSpread = Math.round(settings.glowIntensity / 4);
+                
+                // Box shadow combine both drop shadow and glow
+                key.style.boxShadow = `0px 4px ${settings.shadowBlur}px ${settings.shadowColor}, 0px 0px ${glowSpread}px rgba(${hexToRgb(settings.glowColor)}, ${glowAlpha})`;
+
+                // 4. Background Handling based on Mode (Color | Image | Animation)
+                bgLayer.innerHTML = ''; // Reset inner bg
+                bgLayer.className = 'key-bg-layer'; // Reset classes
+
+                if (settings.bgMode === 'color') {
+                    key.style.backgroundColor = settings.bgColor;
+                    bgLayer.style.backgroundImage = 'none';
+                } else if (settings.bgMode === 'image') {
+                    key.style.backgroundColor = 'transparent';
+                    if (settings.mediaUrl) {
+                        bgLayer.style.backgroundImage = `url(${settings.mediaUrl})`;
+                    } else {
+                        // Default Fallback Pattern
+                        bgLayer.style.backgroundImage = 'linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%)';
+                    }
+                } else if (settings.bgMode === 'animation') {
+                    key.style.backgroundColor = 'transparent';
+                    bgLayer.style.backgroundImage = 'none';
+
+                    if (settings.mediaUrl) {
+                        if (settings.mediaType === 'video') {
+                            const video = document.createElement('video');
+                            video.src = settings.mediaUrl;
+                            video.autoplay = true;
+                            video.loop = true;
+                            video.muted = true;
+                            video.playsInline = true;
+                            bgLayer.appendChild(video);
+                        } else {
+                            bgLayer.style.backgroundImage = `url(${settings.mediaUrl})`;
+                        }
+                    } else {
+                        // Preset Animated Classes
+                        bgLayer.classList.add(`anim-${settings.presetAnim}`);
+                    }
+                }
+            });
+        }
+
+        function applyAllStyles() {
+            applyStylesForCategory('letters');
+            applyStylesForCategory('special');
+        }
+
+        // Hex to RGB Helper
+        function hexToRgb(hex) {
+            let c;
+            if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+                c = hex.substring(1).split('');
+                if (c.length === 3) {
+                    c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+                }
+                c = '0x' + c.join('');
+                return [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',');
+            }
+            return '59, 130, 246';
+        }
+
+        // Live Physical Keyboard Typing Listener & Virtual Keys Sync
+        function setupEventListeners() {
+            const inputField = document.getElementById('type-test-input');
+
+            // Physical Keyboard Down
+            window.addEventListener('keydown', (e) => {
+                const keyName = e.key;
+                const code = e.code;
+
+                // Toggle Caps indicator
+                if (e.getModifierState('CapsLock')) {
+                    document.getElementById('caps-indicator').classList.remove('hidden');
+                } else {
+                    document.getElementById('caps-indicator').classList.add('hidden');
+                }
+
+                highlightVirtualKey(keyName, code, true);
+                playKeySound();
+            });
+
+            window.addEventListener('keyup', (e) => {
+                highlightVirtualKey(e.key, e.code, false);
+            });
+
+            // Virtual Key Click Handler
+            document.querySelectorAll('.key-base').forEach(keyEl => {
+                keyEl.addEventListener('mousedown', () => {
+                    keyEl.classList.add('key-active');
+                    playKeySound();
+                    
+                    const k = keyEl.getAttribute('data-key');
+                    if (k) handleVirtualKeyPress(k);
+                });
+
+                keyEl.addEventListener('mouseup', () => {
+                    keyEl.classList.remove('key-active');
+                });
+
+                keyEl.addEventListener('mouseleave', () => {
+                    keyEl.classList.remove('key-active');
+                });
+            });
+        }
+
+        // Match physical key down event to virtual keyboard key element
+        function highlightVirtualKey(key, code, isActive) {
+            let selector = `[data-key="${key.toLowerCase()}"]`;
+            
+            // Special mappings
+            if (code === 'Space') selector = '[data-key=" "]';
+            if (code === 'Backspace') selector = '[data-key="Backspace"]';
+            if (code === 'Tab') selector = '[data-key="Tab"]';
+            if (code === 'Enter') selector = '[data-key="Enter"]';
+            if (code === 'CapsLock') selector = '[data-key="CapsLock"]';
+            if (code === 'ShiftLeft') selector = '[data-key="ShiftLeft"]';
+            if (code === 'ShiftRight') selector = '[data-key="ShiftRight"]';
+            if (code === 'ControlLeft') selector = '[data-key="ControlLeft"]';
+            if (code === 'ControlRight') selector = '[data-key="ControlRight"]';
+            if (code === 'AltLeft') selector = '[data-key="AltLeft"]';
+            if (code === 'AltRight') selector = '[data-key="AltRight"]';
+
+            const keyEl = document.querySelector(selector);
+            if (keyEl) {
+                if (isActive) {
+                    keyEl.classList.add('key-active');
+                } else {
+                    keyEl.classList.remove('key-active');
+                }
+            }
+        }
+
+        // Virtual Key Input Simulation into Test Field
+        function handleVirtualKeyPress(keyVal) {
+            const input = document.getElementById('type-test-input');
+            if (keyVal === 'Backspace') {
+                input.value = input.value.slice(0, -1);
+            } else if (keyVal === 'Enter') {
+                input.value += '\n';
+            } else if (keyVal === 'Tab') {
+                input.value += '    ';
+            } else if (keyVal.length === 1) {
+                input.value += keyVal;
+            }
+        }
+
+        function clearTestField() {
+            document.getElementById('type-test-input').value = '';
+        }
+
+        // Preset Themes Setup
+        function applyPreset(name) {
+            if (name === 'cyberpunk') {
+                config.letters = {
+                    bgMode: 'color', bgColor: '#180029', textColor: '#00f0ff',
+                    borderColor: '#ff007f', borderWidth: 2, strokeColor: '#00f0ff', strokeWidth: 0,
+                    shadowColor: '#000000', shadowBlur: 15, glowColor: '#ff007f', glowIntensity: 80
+                };
+                config.special = {
+                    bgMode: 'animation', presetAnim: 'cyber-grid', textColor: '#ffe600', iconColor: '#ff007f',
+                    borderColor: '#00f0ff', borderWidth: 2, strokeColor: '#ff007f', strokeWidth: 0,
+                    shadowColor: '#000000', shadowBlur: 15, glowColor: '#00f0ff', glowIntensity: 80
+                };
+            } else if (name === 'rgbGamer') {
+                config.letters = {
+                    bgMode: 'animation', presetAnim: 'rgb-wave', textColor: '#ffffff',
+                    borderColor: '#ffffff', borderWidth: 1, strokeColor: '#000000', strokeWidth: 0,
+                    shadowColor: '#000000', shadowBlur: 10, glowColor: '#00ffcc', glowIntensity: 70
+                };
+                config.special = {
+                    bgMode: 'animation', presetAnim: 'rgb-wave', textColor: '#ffffff', iconColor: '#ffffff',
+                    borderColor: '#ffffff', borderWidth: 2, strokeColor: '#000000', strokeWidth: 0,
+                    shadowColor: '#000000', shadowBlur: 12, glowColor: '#ff00ff', glowIntensity: 90
+                };
+            } else if (name === 'pastel') {
+                config.letters = {
+                    bgMode: 'color', bgColor: '#fce7f3', textColor: '#831843',
+                    borderColor: '#f472b6', borderWidth: 2, strokeColor: '#831843', strokeWidth: 0,
+                    shadowColor: '#fbcfe8', shadowBlur: 8, glowColor: '#f472b6', glowIntensity: 30
+                };
+                config.special = {
+                    bgMode: 'color', bgColor: '#e0e7ff', textColor: '#3730a3', iconColor: '#4f46e5',
+                    borderColor: '#818cf8', borderWidth: 2, strokeColor: '#3730a3', strokeWidth: 0,
+                    shadowColor: '#c7d2fe', shadowBlur: 8, glowColor: '#818cf8', glowIntensity: 30
+                };
+            } else if (name === 'minimal') {
+                config.letters = {
+                    bgMode: 'color', bgColor: '#18181b', textColor: '#f4f4f5',
+                    borderColor: '#27272a', borderWidth: 1, strokeColor: '#f4f4f5', strokeWidth: 0,
+                    shadowColor: '#000000', shadowBlur: 10, glowColor: '#ffffff', glowIntensity: 10
+                };
+                config.special = {
+                    bgMode: 'color', bgColor: '#27272a', textColor: '#f4f4f5', iconColor: '#a1a1aa',
+                    borderColor: '#3f3f46', borderWidth: 1, strokeColor: '#f4f4f5', strokeWidth: 0,
+                    shadowColor: '#000000', shadowBlur: 10, glowColor: '#ffffff', glowIntensity: 10
+                };
+            }
+
+            syncUIWithConfig();
+            applyAllStyles();
+        }
+
+        // Sync Control Inputs with Active Config State
+        function syncUIWithConfig() {
+            ['letters', 'special'].forEach(cat => {
+                const c = config[cat];
+                setBgMode(cat, c.bgMode || 'color');
+
+                for (let key in c) {
+                    const el = document.getElementById(`${cat}-${key}`);
+                    if (el) {
+                        el.value = c[key];
+                    }
+                    const valEl = document.getElementById(`${cat}-${key}-val`);
+                    if (valEl) {
+                        if (key.includes('Blur') || key.includes('Width')) valEl.textContent = `${c[key]} px`;
+                        else if (key.includes('Intensity')) valEl.textContent = `${c[key]}%`;
+                        else valEl.textContent = c[key];
+                    }
+                    const hexEl = document.getElementById(`${cat}-${key}-hex`);
+                    if (hexEl) hexEl.value = c[key];
+                }
+            });
+        }
+
+        // Reset Settings to Defaults
+        function resetToDefault() {
+            config = JSON.parse(JSON.stringify(defaultConfig));
+            syncUIWithConfig();
+            applyAllStyles();
+        }
+
+        // Export Configuration to JSON File
+        function exportConfig() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "keyboard-customizer-config.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Import Configuration from JSON File
+        function importConfig(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.letters && imported.special) {
+                        config = imported;
+                        syncUIWithConfig();
+                        applyAllStyles();
+                    } else {
+                        alert("Invalid configuration JSON format.");
+                    }
+                } catch(err) {
+                    alert("Error reading JSON file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
+```
