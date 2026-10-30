@@ -524,18 +524,6 @@
                             </div>  
                         </div>  
   
-                        <!-- Icon Color -->  
-                        <div class="space-y-1">  
-                            <div class="flex justify-between text-xs">  
-                                <span class="text-slate-700 font-medium">Icon Color</span>  
-                                <span id="special-iconColor-val" class="text-slate-500 font-mono">#f472b6</span>  
-                            </div>  
-                            <div class="flex gap-2">  
-                                <input type="color" id="special-iconColor" value="#f472b6" oninput="updateConfig('special', 'iconColor', this.value)" class="w-8 h-8 bg-white border border-slate-300 rounded cursor-pointer shrink-0">  
-                                <input type="text" id="special-iconColor-hex" value="#f472b6" oninput="updateConfig('special', 'iconColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-2.5 text-xs font-mono focus:outline-none focus:border-purple-500">  
-                            </div>  
-                        </div>  
-  
                         <!-- Border Color & Border Slider -->  
                         <div class="grid grid-cols-2 gap-3">  
                             <div class="space-y-1">  
@@ -654,7 +642,6 @@
                 mediaType: '',  
                 presetClass: '',  
                 textColor: '#ffffff',  
-                iconColor: '#f472b6',  
                 borderColor: '#ec4899',  
                 borderWidth: 1,
                 shadowColor: '#000000',  
@@ -838,7 +825,7 @@
                 key.style.color = c.textColor;  
                 if (category === 'special') {  
                     const icons = key.querySelectorAll('.special-icon');  
-                    icons.forEach(ic => ic.style.color = c.iconColor);  
+                    icons.forEach(ic => ic.style.color = c.textColor);  
                 }  
   
                 // 3. Border  
@@ -989,7 +976,7 @@
 }  
   
 .special-key .icon {  
-  color: ${config.special.iconColor};  
+  color: ${config.special.textColor};  
 }`;  
         }  
   
