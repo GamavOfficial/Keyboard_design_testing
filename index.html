@@ -1,1053 +1,1006 @@
-```html
-<!DOCTYPE html>
-<html lang="en" class="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VP Keyboard Theme Editor</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f6ff',
-                            100: '#e0edff',
-                            500: '#2563eb',
-                            600: '#1d4ed8',
-                            700: '#1e40af'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        .android-key {
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-            transition: transform 0.06s ease, filter 0.12s ease, box-shadow 0.12s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9999px;
-            padding: 2px 0;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: cover;
-        }
-
-        .android-key:active, .android-key.key-pressed {
-            transform: translateY(2px) scale(0.95) !important;
-            filter: brightness(0.9);
-        }
-
-        .anim-rgb-wave {
-            background: linear-gradient(135deg, #ff007f, #7928ca, #00dfd8, #ff007f) !important;
-            background-size: 300% 300% !important;
-            animation: rgbWave 5s infinite linear;
-        }
-
-        .anim-cyber-grid {
-            background: radial-gradient(circle, #2563eb 15%, transparent 16%), #f8fafc !important;
-            background-size: 10px 10px !important;
-            animation: gridPulse 3s infinite ease-in-out;
-        }
-
-        .anim-matrix {
-            background: linear-gradient(180deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 78, 59, 0.8) 50%, rgba(16, 185, 129, 0.3) 100%), #064e3b !important;
-            background-size: 100% 200% !important;
-            animation: matrixFlow 4s infinite linear;
-        }
-
-        .anim-neon-pulse {
-            background: linear-gradient(45deg, #ec4899, #8b5cf6, #3b82f6) !important;
-            background-size: 200% 200% !important;
-            animation: neonPulse 2.5s infinite alternate ease-in-out;
-        }
-
-        @keyframes rgbWave {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes gridPulse {
-            0%, 100% { background-size: 10px 10px; }
-            50% { background-size: 15px 15px; }
-        }
-
-        @keyframes matrixFlow {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 0% 200%; }
-        }
-
-        @keyframes neonPulse {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(90deg); }
-        }
-
-        .key-bg-video {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            pointer-events: none;
-            z-index: 0;
-            border-radius: inherit;
-        }
-
-        .key-content {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .sub-label {
-            font-size: 8px;
-            line-height: 9px;
-            opacity: 0.75;
-            margin-bottom: -1px;
-            font-weight: 600;
-        }
-
-        .main-label {
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 16px;
-        }
-    </style>
-</head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased select-none">
-
-    <!-- HEADER / APP BAR -->
-    <header class="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-3 sm:px-6 sticky top-0 z-50 shadow-sm">
-        <div class="flex items-center gap-2.5">
-            <button onclick="history.back()" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 lg:hidden">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            </button>
-            <div class="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center shadow-md shadow-brand-500/20 text-white">
-                <i data-lucide="palette" class="w-4 h-4"></i>
-            </div>
-            <div>
-                <h1 class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">VP Keyboard Theme Editor</h1>
-                <p class="text-[10px] text-slate-500">Android WebView Theme Creator</p>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-1.5">
-            <button onclick="toggleKeyboardPreview()" id="toggle-preview-btn" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition flex items-center gap-1">
-                <i data-lucide="eye" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Toggle Preview</span>
-            </button>
-            <button onclick="resetToDefaults()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition flex items-center gap-1">
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Reset</span>
-            </button>
-            <button onclick="copyCSSVariables()" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1">
-                <i data-lucide="code" class="w-3.5 h-3.5"></i> <span>Export CSS</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
-
-        <!-- LIVE KEYBOARD PREVIEW -->
-        <section id="keyboard-preview-wrapper" class="flex-1 bg-slate-100 flex flex-col p-3 sm:p-5 overflow-y-auto justify-between gap-3 transition-all duration-300">
-            <div class="w-full max-w-lg mx-auto space-y-1">
-                <div class="flex justify-between items-center text-xs text-slate-500 px-1">
-                    <span class="flex items-center gap-1.5 font-medium text-[11px] text-slate-700">
-                        <i data-lucide="terminal" class="w-3.5 h-3.5 text-brand-600"></i>
-                        Live Typing Screen
-                    </span>
-                    <span id="caps-indicator" class="px-2 py-0.5 rounded bg-white text-slate-500 text-[10px] font-mono border border-slate-200 shadow-2xs">CAPS OFF</span>
-                </div>
-                <div class="relative">
-                    <textarea id="live-typing-box" rows="2" placeholder="Tap keyboard keys below or type using physical keyboard..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-900 font-mono text-xs sm:text-sm focus:outline-none focus:border-brand-500 shadow-xs resize-none"></textarea>
-                    <button onclick="clearTypingBox()" class="absolute right-2.5 bottom-2.5 p-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-500 transition" title="Clear text">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- ANDROID KEYBOARD PREVIEW -->
-            <div id="keyboard-preview-container" class="w-full max-w-[430px] mx-auto my-auto bg-slate-900 rounded-3xl p-3 shadow-xl border border-slate-800 text-white transition-all duration-300">
-                <div class="flex items-center justify-between px-2 pb-2 mb-1.5 border-b border-slate-800 text-slate-400">
-                    <button class="p-1 hover:text-white transition"><i data-lucide="smile" class="w-4 h-4"></i></button>
-                    <button class="p-1 hover:text-white transition"><i data-lucide="palette" class="w-4 h-4"></i></button>
-                    <button class="p-1 hover:text-white transition"><i data-lucide="paperclip" class="w-4 h-4"></i></button>
-                    <button class="p-1 hover:text-white transition"><i data-lucide="type" class="w-4 h-4"></i></button>
-                    <button class="p-1 hover:text-white transition"><span class="text-[9px] font-bold border border-slate-500 rounded px-1">GIF</span></button>
-                    <button onclick="toggleKeyboardPreview()" class="p-1 hover:text-white transition"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-                </div>
-
-                <div class="space-y-1.5">
-                    <div class="grid grid-cols-10 gap-1 w-full">
-                        <button data-key="1" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">1</span></span></button>
-                        <button data-key="2" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">2</span></span></button>
-                        <button data-key="3" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">3</span></span></button>
-                        <button data-key="4" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">4</span></span></button>
-                        <button data-key="5" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">5</span></span></button>
-                        <button data-key="6" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">6</span></span></button>
-                        <button data-key="7" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">7</span></span></button>
-                        <button data-key="8" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">8</span></span></button>
-                        <button data-key="9" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">9</span></span></button>
-                        <button data-key="0" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">0</span></span></button>
-                    </div>
-
-                    <div class="grid grid-cols-10 gap-1 w-full">
-                        <button data-key="q" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">%</span><span class="main-label">Q</span></span></button>
-                        <button data-key="w" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">\</span><span class="main-label">W</span></span></button>
-                        <button data-key="e" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">|</span><span class="main-label">E</span></span></button>
-                        <button data-key="r" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">=</span><span class="main-label">R</span></span></button>
-                        <button data-key="t" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">[</span><span class="main-label">T</span></span></button>
-                        <button data-key="y" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">]</span><span class="main-label">Y</span></span></button>
-                        <button data-key="u" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">&lt;</span><span class="main-label">U</span></span></button>
-                        <button data-key="i" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">&gt;</span><span class="main-label">I</span></span></button>
-                        <button data-key="o" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">{</span><span class="main-label">O</span></span></button>
-                        <button data-key="p" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">}</span><span class="main-label">P</span></span></button>
-                    </div>
-
-                    <div class="flex gap-1 w-full px-2">
-                        <button data-key="a" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">@</span><span class="main-label">A</span></span></button>
-                        <button data-key="s" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">#</span><span class="main-label">S</span></span></button>
-                        <button data-key="d" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">₹</span><span class="main-label">D</span></span></button>
-                        <button data-key="f" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">&amp;</span><span class="main-label">F</span></span></button>
-                        <button data-key="g" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">-</span><span class="main-label">G</span></span></button>
-                        <button data-key="h" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">+</span><span class="main-label">H</span></span></button>
-                        <button data-key="j" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">(</span><span class="main-label">J</span></span></button>
-                        <button data-key="k" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">)</span><span class="main-label">K</span></span></button>
-                        <button data-key="l" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">/</span><span class="main-label">L</span></span></button>
-                    </div>
-
-                    <div class="flex gap-1 w-full">
-                        <button data-key="Shift" class="android-key key-special w-[12.5%] h-11"><span class="key-content"><i data-lucide="arrow-big-up" class="special-icon w-4 h-4"></i></span></button>
-                        <button data-key="z" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">*</span><span class="main-label">Z</span></span></button>
-                        <button data-key="x" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">"</span><span class="main-label">X</span></span></button>
-                        <button data-key="c" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">'</span><span class="main-label">C</span></span></button>
-                        <button data-key="v" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">:</span><span class="main-label">V</span></span></button>
-                        <button data-key="b" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">;</span><span class="main-label">B</span></span></button>
-                        <button data-key="n" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">!</span><span class="main-label">N</span></span></button>
-                        <button data-key="m" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">?</span><span class="main-label">M</span></span></button>
-                        <button data-key="Backspace" class="android-key key-special w-[12.5%] h-11"><span class="key-content"><i data-lucide="delete" class="special-icon w-4 h-4"></i></span></button>
-                    </div>
-
-                    <div class="flex gap-1 w-full">
-                        <button data-key="?123" class="android-key key-special w-[15%] h-11"><span class="key-content"><span class="main-label text-xs">?123</span></span></button>
-                        <button data-key="Emoji" class="android-key key-special w-[11%] h-11"><span class="key-content"><i data-lucide="smile" class="special-icon w-4 h-4"></i></span></button>
-                        <button data-key="," class="android-key key-special w-[9%] h-11"><span class="key-content"><span class="main-label">,</span></span></button>
-                        <button data-key=" " class="android-key key-special flex-1 h-11"><span class="key-content"><span class="main-label text-xs font-bold">EN</span></span></button>
-                        <button data-key="." class="android-key key-special w-[11%] h-11"><span class="key-content"><span class="sub-label font-bold">!?</span><span class="main-label">.</span></span></button>
-                        <button data-key="Enter" class="android-key key-special w-[16%] h-11"><span class="key-content"><i data-lucide="corner-down-left" class="special-icon w-4 h-4"></i></span></button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center text-[11px] text-slate-400">
-                Live Preview Mode • Android WebView Bridge Ready
-            </div>
-        </section>
-
-        <!-- CONTROL PANEL -->
-        <aside class="w-full lg:w-[420px] bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col h-auto lg:h-full overflow-hidden shadow-lg">
-            
-            <div class="p-3 border-b border-slate-200 bg-slate-50 flex gap-2">
-                <button id="tab-btn-letters" onclick="switchTab('letters')" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-brand-600 text-white shadow-sm transition">
-                    <i data-lucide="type" class="w-4 h-4"></i>
-                    Letters Keys
-                </button>
-                <button id="tab-btn-special" onclick="switchTab('special')" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300 transition">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    Special Keys
-                </button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto p-4 space-y-6">
-
-                <!-- 1. LETTERS KEYS CUSTOMIZATION PANEL -->
-                <div id="panel-letters" class="space-y-5">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
-                            Letters Keys Customization
-                        </h3>
-                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-medium">A-Z, 0-9</span>
-                    </div>
-
-                    <!-- Key Type Switcher -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-semibold text-slate-700">Key Type</label>
-                        <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                            <button type="button" onclick="setBgMode('letters', 'color')" id="letters-bg-mode-color" class="py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white transition">Color</button>
-                            <button type="button" onclick="setBgMode('letters', 'image')" id="letters-bg-mode-image" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Image</button>
-                            <button type="button" onclick="setBgMode('letters', 'animation')" id="letters-bg-mode-animation" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Animation</button>
-                        </div>
-                    </div>
-
-                    <!-- Color Mode Controls -->
-                    <div id="letters-ctrl-color" class="space-y-1.5">
-                        <label class="text-xs font-medium text-slate-700 flex justify-between">
-                            <span>Key Color</span>
-                            <span id="letters-bgColor-val" class="text-slate-500 font-mono">#262938</span>
-                        </label>
-                        <div class="flex gap-2">
-                            <input type="color" id="letters-bgColor" value="#262938" oninput="updateConfig('letters', 'bgColor', this.value)" class="w-10 h-9 bg-white border border-slate-300 rounded-lg cursor-pointer shrink-0">
-                            <input type="text" id="letters-bgColor-hex" value="#262938" oninput="updateConfig('letters', 'bgColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 text-xs font-mono focus:outline-none focus:border-brand-500">
-                        </div>
-                    </div>
-
-                    <!-- Image Mode Controls -->
-                    <div id="letters-ctrl-image" class="space-y-2 hidden">
-                        <label class="text-xs font-medium text-slate-700">Key Texture</label>
-                        <div class="flex items-center gap-2">
-                            <label class="flex-1 cursor-pointer bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">
-                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Image
-                                <input type="file" id="letters-img-file" accept="image/png, image/jpeg, image/webp" onchange="handleFileUpload('letters', 'image', this)" class="hidden">
-                            </label>
-                            <button onclick="clearMedia('letters')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Image">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Animation Mode Controls -->
-                    <div id="letters-ctrl-animation" class="space-y-2 hidden">
-                        <label class="text-xs font-medium text-slate-700">Key Animation</label>
-                        <div class="flex items-center gap-2">
-                            <label class="flex-1 cursor-pointer bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">
-                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Animation
-                                <input type="file" id="letters-anim-file" accept="image/gif, image/webp, video/mp4" onchange="handleFileUpload('letters', 'animation', this)" class="hidden">
-                            </label>
-                            <button onclick="clearMedia('letters')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Animation">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1.5 pt-1">
-                            <button onclick="setPresetAnim('letters', 'rgb-wave')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-brand-500 flex items-center gap-2 font-medium">
-                                <span class="w-3 h-3 rounded-full anim-rgb-wave inline-block shrink-0"></span> RGB Wave
-                            </button>
-                            <button onclick="setPresetAnim('letters', 'cyber-grid')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-brand-500 flex items-center gap-2 font-medium">
-                                <span class="w-3 h-3 rounded-full anim-cyber-grid inline-block shrink-0"></span> Cyber Grid
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Keys Settings -->
-                    <div class="border-t border-slate-200 pt-3 space-y-3.5">
-                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Keys Settings</h4>
-
-                        <!-- Keys Text Color -->
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs">
-                                <span class="text-slate-700 font-medium">Keys Text Color</span>
-                                <span id="letters-textColor-val" class="text-slate-500 font-mono">#ffffff</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <input type="color" id="letters-textColor" value="#ffffff" oninput="updateConfig('letters', 'textColor', this.value)" class="w-8 h-8 bg-white border border-slate-300 rounded cursor-pointer shrink-0">
-                                <input type="text" id="letters-textColor-hex" value="#ffffff" oninput="updateConfig('letters', 'textColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">
-                            </div>
-                        </div>
-
-                        <!-- Border Color & Border Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Border Color</span>
-                                <input type="color" id="letters-borderColor" value="#3b82f6" oninput="updateConfig('letters', 'borderColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Border</span>
-                                    <span id="letters-borderWidth-val" class="text-slate-500 font-mono">1 px</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('letters-borderWidth', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="letters-borderWidth" min="0" max="10" value="1" oninput="updateConfig('letters', 'borderWidth', this.value)" class="w-full accent-brand-600">
-                                    <button onclick="stepSlider('letters-borderWidth', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stroke Color & Stroke Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Stroke Color</span>
-                                <input type="color" id="letters-strokeColor" value="#38bdf8" oninput="updateConfig('letters', 'strokeColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Stroke</span>
-                                    <span id="letters-strokeWidth-val" class="text-slate-500 font-mono">1 px</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('letters-strokeWidth', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="letters-strokeWidth" min="0" max="5" value="1" oninput="updateConfig('letters', 'strokeWidth', this.value)" class="w-full accent-brand-600">
-                                    <button onclick="stepSlider('letters-strokeWidth', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
+<!DOCTYPE html>  
+<html lang="en" class="light">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+    <title>VP Keyboard Theme Editor</title>  
+    <!-- Tailwind CSS -->  
+    <script src="https://cdn.tailwindcss.com"></script>  
+    <!-- Lucide Icons -->  
+    <script src="https://unpkg.com/lucide@latest"></script>  
+    <script>  
+        tailwind.config = {  
+            darkMode: 'class',  
+            theme: {  
+                extend: {  
+                    colors: {  
+                        brand: {  
+                            50: '#f0f6ff',  
+                            100: '#e0edff',  
+                            500: '#2563eb',  
+                            600: '#1d4ed8',  
+                            700: '#1e40af'  
+                        }  
+                    },  
+                    fontFamily: {  
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],  
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']  
+                    }  
+                }  
+            }  
+        }  
+    </script>  
+    <style>  
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');  
+  
+        ::-webkit-scrollbar {  
+            width: 5px;  
+            height: 5px;  
+        }  
+        ::-webkit-scrollbar-track {  
+            background: #f1f5f9;  
+        }  
+        ::-webkit-scrollbar-thumb {  
+            background: #cbd5e1;  
+            border-radius: 4px;  
+        }  
+  
+        .android-key {  
+            user-select: none;  
+            -webkit-user-select: none;  
+            touch-action: manipulation;  
+            transition: transform 0.06s ease, filter 0.12s ease, box-shadow 0.12s ease;  
+            position: relative;  
+            overflow: hidden;  
+            display: flex;  
+            flex-direction: column;  
+            align-items: center;  
+            justify-content: center;  
+            border-radius: 9999px;  
+            padding: 2px 0;  
+            background-repeat: no-repeat;  
+            background-position: center;  
+            background-size: cover;  
+        }  
+  
+        .android-key:active, .android-key.key-pressed {  
+            transform: translateY(2px) scale(0.95) !important;  
+            filter: brightness(0.9);  
+        }  
+  
+        .anim-rgb-wave {  
+            background: linear-gradient(135deg, #ff007f, #7928ca, #00dfd8, #ff007f) !important;  
+            background-size: 300% 300% !important;  
+            animation: rgbWave 5s infinite linear;  
+        }  
+  
+        .anim-cyber-grid {  
+            background: radial-gradient(circle, #2563eb 15%, transparent 16%), #f8fafc !important;  
+            background-size: 10px 10px !important;  
+            animation: gridPulse 3s infinite ease-in-out;  
+        }  
+  
+        .anim-matrix {  
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 78, 59, 0.8) 50%, rgba(16, 185, 129, 0.3) 100%), #064e3b !important;  
+            background-size: 100% 200% !important;  
+            animation: matrixFlow 4s infinite linear;  
+        }  
+  
+        .anim-neon-pulse {  
+            background: linear-gradient(45deg, #ec4899, #8b5cf6, #3b82f6) !important;  
+            background-size: 200% 200% !important;  
+            animation: neonPulse 2.5s infinite alternate ease-in-out;  
+        }  
+  
+        @keyframes rgbWave {  
+            0% { background-position: 0% 50%; }  
+            50% { background-position: 100% 50%; }  
+            100% { background-position: 0% 50%; }  
+        }  
+  
+        @keyframes gridPulse {  
+            0%, 100% { background-size: 10px 10px; }  
+            50% { background-size: 15px 15px; }  
+        }  
+  
+        @keyframes matrixFlow {  
+            0% { background-position: 0% 0%; }  
+            100% { background-position: 0% 200%; }  
+        }  
+  
+        @keyframes neonPulse {  
+            0% { filter: hue-rotate(0deg); }  
+            100% { filter: hue-rotate(90deg); }  
+        }  
+  
+        .key-bg-video {  
+            position: absolute;  
+            inset: 0;  
+            width: 100%;  
+            height: 100%;  
+            object-fit: cover;  
+            pointer-events: none;  
+            z-index: 0;  
+            border-radius: inherit;  
+        }  
+  
+        .key-content {  
+            position: relative;  
+            z-index: 10;  
+            display: flex;  
+            flex-direction: column;  
+            align-items: center;  
+            justify-content: center;  
+            width: 100%;  
+            height: 100%;  
+            pointer-events: none;  
+        }  
+  
+        .sub-label {  
+            font-size: 8px;  
+            line-height: 9px;  
+            opacity: 0.75;  
+            margin-bottom: -1px;  
+            font-weight: 600;  
+        }  
+  
+        .main-label {  
+            font-size: 14px;  
+            font-weight: 600;  
+            line-height: 16px;  
+        }  
+    </style>  
+</head>  
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased select-none">  
+  
+    <!-- HEADER / APP BAR -->  
+    <header class="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-3 sm:px-6 sticky top-0 z-50 shadow-sm">  
+        <div class="flex items-center gap-2.5">  
+            <button onclick="history.back()" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 lg:hidden">  
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>  
+            </button>  
+            <div class="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center shadow-md shadow-brand-500/20 text-white">  
+                <i data-lucide="palette" class="w-4 h-4"></i>  
+            </div>  
+            <div>  
+                <h1 class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">VP Keyboard Theme Editor</h1>  
+                <p class="text-[10px] text-slate-500">Android WebView Theme Creator</p>  
+            </div>  
+        </div>  
+  
+        <div class="flex items-center gap-1.5">  
+            <button onclick="toggleKeyboardPreview()" id="toggle-preview-btn" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition flex items-center gap-1">  
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Toggle Preview</span>  
+            </button>  
+            <button onclick="resetToDefaults()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 transition flex items-center gap-1">  
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Reset</span>  
+            </button>  
+            <button onclick="copyCSSVariables()" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1">  
+                <i data-lucide="code" class="w-3.5 h-3.5"></i> <span>Export CSS</span>  
+            </button>  
+        </div>  
+    </header>  
+  
+    <!-- MAIN CONTAINER -->  
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">  
+  
+        <!-- LIVE KEYBOARD PREVIEW -->  
+        <section id="keyboard-preview-wrapper" class="flex-1 bg-slate-100 flex flex-col p-3 sm:p-5 overflow-y-auto justify-between gap-3 transition-all duration-300">  
+            <div class="w-full max-w-lg mx-auto space-y-1">  
+                <div class="flex justify-between items-center text-xs text-slate-500 px-1">  
+                    <span class="flex items-center gap-1.5 font-medium text-[11px] text-slate-700">  
+                        <i data-lucide="terminal" class="w-3.5 h-3.5 text-brand-600"></i>  
+                        Live Typing Screen  
+                    </span>  
+                    <span id="caps-indicator" class="px-2 py-0.5 rounded bg-white text-slate-500 text-[10px] font-mono border border-slate-200 shadow-2xs">CAPS OFF</span>  
+                </div>  
+                <div class="relative">  
+                    <textarea id="live-typing-box" rows="2" placeholder="Tap keyboard keys below or type using physical keyboard..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-900 font-mono text-xs sm:text-sm focus:outline-none focus:border-brand-500 shadow-xs resize-none"></textarea>  
+                    <button onclick="clearTypingBox()" class="absolute right-2.5 bottom-2.5 p-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-500 transition" title="Clear text">  
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>  
+                    </button>  
+                </div>  
+            </div>  
+  
+            <!-- ANDROID KEYBOARD PREVIEW -->  
+            <div id="keyboard-preview-container" class="w-full max-w-[430px] mx-auto my-auto bg-slate-900 rounded-3xl p-3 shadow-xl border border-slate-800 text-white transition-all duration-300">  
+                <div class="flex items-center justify-between px-2 pb-2 mb-1.5 border-b border-slate-800 text-slate-400">  
+                    <button class="p-1 hover:text-white transition"><i data-lucide="smile" class="w-4 h-4"></i></button>  
+                    <button class="p-1 hover:text-white transition"><i data-lucide="palette" class="w-4 h-4"></i></button>  
+                    <button class="p-1 hover:text-white transition"><i data-lucide="paperclip" class="w-4 h-4"></i></button>  
+                    <button class="p-1 hover:text-white transition"><i data-lucide="type" class="w-4 h-4"></i></button>  
+                    <button class="p-1 hover:text-white transition"><span class="text-[9px] font-bold border border-slate-500 rounded px-1">GIF</span></button>  
+                    <button onclick="toggleKeyboardPreview()" class="p-1 hover:text-white transition"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>  
+                </div>  
+  
+                <div class="space-y-1.5">  
+                    <div class="grid grid-cols-10 gap-1 w-full">  
+                        <button data-key="1" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">1</span></span></button>  
+                        <button data-key="2" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">2</span></span></button>  
+                        <button data-key="3" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">3</span></span></button>  
+                        <button data-key="4" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">4</span></span></button>  
+                        <button data-key="5" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">5</span></span></button>  
+                        <button data-key="6" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">6</span></span></button>  
+                        <button data-key="7" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">7</span></span></button>  
+                        <button data-key="8" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">8</span></span></button>  
+                        <button data-key="9" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">9</span></span></button>  
+                        <button data-key="0" class="android-key key-letter h-10"><span class="key-content"><span class="main-label">0</span></span></button>  
+                    </div>  
+  
+                    <div class="grid grid-cols-10 gap-1 w-full">  
+                        <button data-key="q" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">%</span><span class="main-label">Q</span></span></button>  
+                        <button data-key="w" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">\</span><span class="main-label">W</span></span></button>  
+                        <button data-key="e" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">|</span><span class="main-label">E</span></span></button>  
+                        <button data-key="r" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">=</span><span class="main-label">R</span></span></button>  
+                        <button data-key="t" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">[</span><span class="main-label">T</span></span></button>  
+                        <button data-key="y" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">]</span><span class="main-label">Y</span></span></button>  
+                        <button data-key="u" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">&lt;</span><span class="main-label">U</span></span></button>  
+                        <button data-key="i" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">&gt;</span><span class="main-label">I</span></span></button>  
+                        <button data-key="o" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">{</span><span class="main-label">O</span></span></button>  
+                        <button data-key="p" class="android-key key-letter h-11"><span class="key-content"><span class="sub-label">}</span><span class="main-label">P</span></span></button>  
+                    </div>  
+  
+                    <div class="flex gap-1 w-full px-2">  
+                        <button data-key="a" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">@</span><span class="main-label">A</span></span></button>  
+                        <button data-key="s" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">#</span><span class="main-label">S</span></span></button>  
+                        <button data-key="d" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">₹</span><span class="main-label">D</span></span></button>  
+                        <button data-key="f" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">&amp;</span><span class="main-label">F</span></span></button>  
+                        <button data-key="g" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">-</span><span class="main-label">G</span></span></button>  
+                        <button data-key="h" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">+</span><span class="main-label">H</span></span></button>  
+                        <button data-key="j" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">(</span><span class="main-label">J</span></span></button>  
+                        <button data-key="k" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">)</span><span class="main-label">K</span></span></button>  
+                        <button data-key="l" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">/</span><span class="main-label">L</span></span></button>  
+                    </div>  
+  
+                    <div class="flex gap-1 w-full">  
+                        <button data-key="Shift" class="android-key key-special w-[12.5%] h-11"><span class="key-content"><i data-lucide="arrow-big-up" class="special-icon w-4 h-4"></i></span></button>  
+                        <button data-key="z" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">*</span><span class="main-label">Z</span></span></button>  
+                        <button data-key="x" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">"</span><span class="main-label">X</span></span></button>  
+                        <button data-key="c" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">'</span><span class="main-label">C</span></span></button>  
+                        <button data-key="v" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">:</span><span class="main-label">V</span></span></button>  
+                        <button data-key="b" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">;</span><span class="main-label">B</span></span></button>  
+                        <button data-key="n" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">!</span><span class="main-label">N</span></span></button>  
+                        <button data-key="m" class="android-key key-letter flex-1 h-11"><span class="key-content"><span class="sub-label">?</span><span class="main-label">M</span></span></button>  
+                        <button data-key="Backspace" class="android-key key-special w-[12.5%] h-11"><span class="key-content"><i data-lucide="delete" class="special-icon w-4 h-4"></i></span></button>  
+                    </div>  
+  
+                    <div class="flex gap-1 w-full">  
+                        <button data-key="?123" class="android-key key-special w-[15%] h-11"><span class="key-content"><span class="main-label text-xs">?123</span></span></button>  
+                        <button data-key="Emoji" class="android-key key-special w-[11%] h-11"><span class="key-content"><i data-lucide="smile" class="special-icon w-4 h-4"></i></span></button>  
+                        <button data-key="," class="android-key key-special w-[9%] h-11"><span class="key-content"><span class="main-label">,</span></span></button>  
+                        <button data-key=" " class="android-key key-special flex-1 h-11"><span class="key-content"><span class="main-label text-xs font-bold">EN</span></span></button>  
+                        <button data-key="." class="android-key key-special w-[11%] h-11"><span class="key-content"><span class="sub-label font-bold">!?</span><span class="main-label">.</span></span></button>  
+                        <button data-key="Enter" class="android-key key-special w-[16%] h-11"><span class="key-content"><i data-lucide="corner-down-left" class="special-icon w-4 h-4"></i></span></button>  
+                    </div>  
+                </div>  
+            </div>  
+  
+            <div class="text-center text-[11px] text-slate-400">  
+                Live Preview Mode • Android WebView Bridge Ready  
+            </div>  
+        </section>  
+  
+        <!-- CONTROL PANEL -->  
+        <aside class="w-full lg:w-[420px] bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col h-auto lg:h-full overflow-hidden shadow-lg">  
+              
+            <div class="p-3 border-b border-slate-200 bg-slate-50 flex gap-2">  
+                <button id="tab-btn-letters" onclick="switchTab('letters')" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-brand-600 text-white shadow-sm transition">  
+                    <i data-lucide="type" class="w-4 h-4"></i>  
+                    Letters Keys  
+                </button>  
+                <button id="tab-btn-special" onclick="switchTab('special')" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300 transition">  
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>  
+                    Special Keys  
+                </button>  
+            </div>  
+  
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">  
+  
+                <!-- 1. LETTERS KEYS CUSTOMIZATION PANEL -->  
+                <div id="panel-letters" class="space-y-5">  
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">  
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">  
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>  
+                            Letters Keys Customization  
+                        </h3>  
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-medium">A-Z, 0-9</span>  
+                    </div>  
+  
+                    <!-- Key Type Switcher -->  
+                    <div class="space-y-1.5">  
+                        <label class="text-xs font-semibold text-slate-700">Key Type</label>  
+                        <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">  
+                            <button type="button" onclick="setBgMode('letters', 'color')" id="letters-bg-mode-color" class="py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white transition">Color</button>  
+                            <button type="button" onclick="setBgMode('letters', 'image')" id="letters-bg-mode-image" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Image</button>  
+                            <button type="button" onclick="setBgMode('letters', 'animation')" id="letters-bg-mode-animation" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Animation</button>  
+                        </div>  
+                    </div>  
+  
+                    <!-- Color Mode Controls -->  
+                    <div id="letters-ctrl-color" class="space-y-1.5">  
+                        <label class="text-xs font-medium text-slate-700 flex justify-between">  
+                            <span>Key Color</span>  
+                            <span id="letters-bgColor-val" class="text-slate-500 font-mono">#262938</span>  
+                        </label>  
+                        <div class="flex gap-2">  
+                            <input type="color" id="letters-bgColor" value="#262938" oninput="updateConfig('letters', 'bgColor', this.value)" class="w-10 h-9 bg-white border border-slate-300 rounded-lg cursor-pointer shrink-0">  
+                            <input type="text" id="letters-bgColor-hex" value="#262938" oninput="updateConfig('letters', 'bgColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 text-xs font-mono focus:outline-none focus:border-brand-500">  
+                        </div>  
+                    </div>  
+  
+                    <!-- Image Mode Controls -->  
+                    <div id="letters-ctrl-image" class="space-y-2 hidden">  
+                        <label class="text-xs font-medium text-slate-700">Key Texture</label>  
+                        <div class="flex items-center gap-2">  
+                            <label class="flex-1 cursor-pointer bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">  
+                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Image  
+                                <input type="file" id="letters-img-file" accept="image/png, image/jpeg, image/webp" onchange="handleFileUpload('letters', 'image', this)" class="hidden">  
+                            </label>  
+                            <button onclick="clearMedia('letters')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Image">  
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>  
+                            </button>  
+                        </div>  
+                    </div>  
+  
+                    <!-- Animation Mode Controls -->  
+                    <div id="letters-ctrl-animation" class="space-y-2 hidden">  
+                        <label class="text-xs font-medium text-slate-700">Key Animation</label>  
+                        <div class="flex items-center gap-2">  
+                            <label class="flex-1 cursor-pointer bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">  
+                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Animation  
+                                <input type="file" id="letters-anim-file" accept="image/gif, image/webp, video/mp4" onchange="handleFileUpload('letters', 'animation', this)" class="hidden">  
+                            </label>  
+                            <button onclick="clearMedia('letters')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Animation">  
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>  
+                            </button>  
+                        </div>  
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">  
+                            <button onclick="setPresetAnim('letters', 'rgb-wave')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-brand-500 flex items-center gap-2 font-medium">  
+                                <span class="w-3 h-3 rounded-full anim-rgb-wave inline-block shrink-0"></span> RGB Wave  
+                            </button>  
+                            <button onclick="setPresetAnim('letters', 'cyber-grid')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-brand-500 flex items-center gap-2 font-medium">  
+                                <span class="w-3 h-3 rounded-full anim-cyber-grid inline-block shrink-0"></span> Cyber Grid  
+                            </button>  
+                        </div>  
+                    </div>  
+  
+                    <!-- Keys Settings -->  
+                    <div class="border-t border-slate-200 pt-3 space-y-3.5">  
+                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Keys Settings</h4>  
+  
+                        <!-- Keys Text Color -->  
+                        <div class="space-y-1">  
+                            <div class="flex justify-between text-xs">  
+                                <span class="text-slate-700 font-medium">Keys Text Color</span>  
+                                <span id="letters-textColor-val" class="text-slate-500 font-mono">#ffffff</span>  
+                            </div>  
+                            <div class="flex gap-2">  
+                                <input type="color" id="letters-textColor" value="#ffffff" oninput="updateConfig('letters', 'textColor', this.value)" class="w-8 h-8 bg-white border border-slate-300 rounded cursor-pointer shrink-0">  
+                                <input type="text" id="letters-textColor-hex" value="#ffffff" oninput="updateConfig('letters', 'textColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-2.5 text-xs font-mono focus:outline-none focus:border-brand-500">  
+                            </div>  
+                        </div>  
+  
+                        <!-- Border Color & Border Slider -->  
+                        <div class="grid grid-cols-2 gap-3">  
+                            <div class="space-y-1">  
+                                <span class="text-xs text-slate-700 font-medium block">Border Color</span>  
+                                <input type="color" id="letters-borderColor" value="#3b82f6" oninput="updateConfig('letters', 'borderColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">  
+                            </div>  
+                            <div class="space-y-1">  
+                                <div class="flex justify-between text-xs">  
+                                    <span class="text-slate-700 font-medium">Border</span>  
+                                    <span id="letters-borderWidth-val" class="text-slate-500 font-mono">1 px</span>  
+                                </div>  
+                                <div class="flex items-center gap-1.5 pt-0.5">  
+                                    <button onclick="stepSlider('letters-borderWidth', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>  
+                                    <input type="range" id="letters-borderWidth" min="0" max="10" value="1" oninput="updateConfig('letters', 'borderWidth', this.value)" class="w-full accent-brand-600">  
+                                    <button onclick="stepSlider('letters-borderWidth', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>  
+                                </div>  
+                            </div>  
                         </div>
 
-                        <!-- Shadow Color & Shadow Blur Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Shadow Color</span>
-                                <input type="color" id="letters-shadowColor" value="#000000" oninput="updateConfig('letters', 'shadowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Shadow Blur</span>
-                                    <span id="letters-shadowBlur-val" class="text-slate-500 font-mono">12 px</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('letters-shadowBlur', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="letters-shadowBlur" min="0" max="30" value="12" oninput="updateConfig('letters', 'shadowBlur', this.value)" class="w-full accent-brand-600">
-                                    <button onclick="stepSlider('letters-shadowBlur', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
+                        <!-- Shadow Color & Shadow Blur Slider -->  
+                        <div class="grid grid-cols-2 gap-3">  
+                            <div class="space-y-1">  
+                                <span class="text-xs text-slate-700 font-medium block">Shadow Color</span>  
+                                <input type="color" id="letters-shadowColor" value="#000000" oninput="updateConfig('letters', 'shadowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">  
+                            </div>  
+                            <div class="space-y-1">  
+                                <div class="flex justify-between text-xs">  
+                                    <span class="text-slate-700 font-medium">Shadow Blur</span>  
+                                    <span id="letters-shadowBlur-val" class="text-slate-500 font-mono">12 px</span>  
+                                </div>  
+                                <div class="flex items-center gap-1.5 pt-0.5">  
+                                    <button onclick="stepSlider('letters-shadowBlur', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>  
+                                    <input type="range" id="letters-shadowBlur" min="0" max="30" value="12" oninput="updateConfig('letters', 'shadowBlur', this.value)" class="w-full accent-brand-600">  
+                                    <button onclick="stepSlider('letters-shadowBlur', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>  
+                                </div>  
+                            </div>  
+                        </div>  
+  
+                        <!-- Glow Color & Glow Slider -->  
+                        <div class="grid grid-cols-2 gap-3">  
+                            <div class="space-y-1">  
+                                <span class="text-xs text-slate-700 font-medium block">Glow Color</span>  
+                                <input type="color" id="letters-glowColor" value="#3b82f6" oninput="updateConfig('letters', 'glowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">  
+                            </div>  
+                            <div class="space-y-1">  
+                                <div class="flex justify-between text-xs">  
+                                    <span class="text-slate-700 font-medium">Glow</span>  
+                                    <span id="letters-glowIntensity-val" class="text-slate-500 font-mono">50%</span>  
+                                </div>  
+                                <div class="flex items-center gap-1.5 pt-0.5">  
+                                    <button onclick="stepSlider('letters-glowIntensity', -5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>  
+                                    <input type="range" id="letters-glowIntensity" min="0" max="100" value="50" oninput="updateConfig('letters', 'glowIntensity', this.value)" class="w-full accent-brand-600">  
+                                    <button onclick="stepSlider('letters-glowIntensity', 5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>  
+                                </div>  
+                            </div>  
+                        </div>  
+  
+                    </div>  
+                </div>  
+  
+                <!-- 2. SPECIAL KEYS CUSTOMIZATION PANEL -->  
+                <div id="panel-special" class="space-y-5 hidden">  
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">  
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">  
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>  
+                            Special Keys Customization  
+                        </h3>  
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-medium">Shift, Delete, Space, Enter, ?123</span>  
+                    </div>  
+  
+                    <!-- Key Type Switcher -->  
+                    <div class="space-y-1.5">  
+                        <label class="text-xs font-semibold text-slate-700">Key Type</label>  
+                        <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">  
+                            <button type="button" onclick="setBgMode('special', 'color')" id="special-bg-mode-color" class="py-1.5 rounded-lg text-xs font-medium bg-purple-600 text-white transition">Color</button>  
+                            <button type="button" onclick="setBgMode('special', 'image')" id="special-bg-mode-image" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Image</button>  
+                            <button type="button" onclick="setBgMode('special', 'animation')" id="special-bg-mode-animation" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Animation</button>  
+                        </div>  
+                    </div>  
+  
+                    <!-- Color Mode Controls -->  
+                    <div id="special-ctrl-color" class="space-y-1.5">  
+                        <label class="text-xs font-medium text-slate-700 flex justify-between">  
+                            <span>Key Color</span>  
+                            <span id="special-bgColor-val" class="text-slate-500 font-mono">#381c3b</span>  
+                        </label>  
+                        <div class="flex gap-2">  
+                            <input type="color" id="special-bgColor" value="#381c3b" oninput="updateConfig('special', 'bgColor', this.value)" class="w-10 h-9 bg-white border border-slate-300 rounded-lg cursor-pointer shrink-0">  
+                            <input type="text" id="special-bgColor-hex" value="#381c3b" oninput="updateConfig('special', 'bgColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 text-xs font-mono focus:outline-none focus:border-purple-500">  
+                        </div>  
+                    </div>  
+  
+                    <!-- Image Mode Controls -->  
+                    <div id="special-ctrl-image" class="space-y-2 hidden">  
+                        <label class="text-xs font-medium text-slate-700">Key Texture</label>  
+                        <div class="flex items-center gap-2">  
+                            <label class="flex-1 cursor-pointer bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">  
+                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Image  
+                                <input type="file" id="special-img-file" accept="image/png, image/jpeg, image/webp" onchange="handleFileUpload('special', 'image', this)" class="hidden">  
+                            </label>  
+                            <button onclick="clearMedia('special')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Image">  
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>  
+                            </button>  
+                        </div>  
+                    </div>  
+  
+                    <!-- Animation Mode Controls -->  
+                    <div id="special-ctrl-animation" class="space-y-2 hidden">  
+                        <label class="text-xs font-medium text-slate-700">Key Animation</label>  
+                        <div class="flex items-center gap-2">  
+                            <label class="flex-1 cursor-pointer bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">  
+                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Animation  
+                                <input type="file" id="special-anim-file" accept="image/gif, image/webp, video/mp4" onchange="handleFileUpload('special', 'animation', this)" class="hidden">  
+                            </label>  
+                            <button onclick="clearMedia('special')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Animation">  
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>  
+                            </button>  
+                        </div>  
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">  
+                            <button onclick="setPresetAnim('special', 'rgb-wave')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-purple-500 flex items-center gap-2 font-medium">  
+                                <span class="w-3 h-3 rounded-full anim-rgb-wave inline-block shrink-0"></span> RGB Wave  
+                            </button>  
+                            <button onclick="setPresetAnim('special', 'cyber-grid')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-purple-500 flex items-center gap-2 font-medium">  
+                                <span class="w-3 h-3 rounded-full anim-cyber-grid inline-block shrink-0"></span> Cyber Grid  
+                            </button>  
+                        </div>  
+                    </div>  
+  
+                    <!-- Keys Settings -->  
+                    <div class="border-t border-slate-200 pt-3 space-y-3.5">  
+                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Keys Settings</h4>  
+  
+                        <!-- Keys Text Color -->  
+                        <div class="space-y-1">  
+                            <div class="flex justify-between text-xs">  
+                                <span class="text-slate-700 font-medium">Keys Text Color</span>  
+                                <span id="special-textColor-val" class="text-slate-500 font-mono">#ffffff</span>  
+                            </div>  
+                            <div class="flex gap-2">  
+                                <input type="color" id="special-textColor" value="#ffffff" oninput="updateConfig('special', 'textColor', this.value)" class="w-8 h-8 bg-white border border-slate-300 rounded cursor-pointer shrink-0">  
+                                <input type="text" id="special-textColor-hex" value="#ffffff" oninput="updateConfig('special', 'textColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-2.5 text-xs font-mono focus:outline-none focus:border-purple-500">  
+                            </div>  
+                        </div>  
+  
+                        <!-- Icon Color -->  
+                        <div class="space-y-1">  
+                            <div class="flex justify-between text-xs">  
+                                <span class="text-slate-700 font-medium">Icon Color</span>  
+                                <span id="special-iconColor-val" class="text-slate-500 font-mono">#f472b6</span>  
+                            </div>  
+                            <div class="flex gap-2">  
+                                <input type="color" id="special-iconColor" value="#f472b6" oninput="updateConfig('special', 'iconColor', this.value)" class="w-8 h-8 bg-white border border-slate-300 rounded cursor-pointer shrink-0">  
+                                <input type="text" id="special-iconColor-hex" value="#f472b6" oninput="updateConfig('special', 'iconColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-2.5 text-xs font-mono focus:outline-none focus:border-purple-500">  
+                            </div>  
+                        </div>  
+  
+                        <!-- Border Color & Border Slider -->  
+                        <div class="grid grid-cols-2 gap-3">  
+                            <div class="space-y-1">  
+                                <span class="text-xs text-slate-700 font-medium block">Border Color</span>  
+                                <input type="color" id="special-borderColor" value="#ec4899" oninput="updateConfig('special', 'borderColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">  
+                            </div>  
+                            <div class="space-y-1">  
+                                <div class="flex justify-between text-xs">  
+                                    <span class="text-slate-700 font-medium">Border</span>  
+                                    <span id="special-borderWidth-val" class="text-slate-500 font-mono">1 px</span>  
+                                </div>  
+                                <div class="flex items-center gap-1.5 pt-0.5">  
+                                    <button onclick="stepSlider('special-borderWidth', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>  
+                                    <input type="range" id="special-borderWidth" min="0" max="10" value="1" oninput="updateConfig('special', 'borderWidth', this.value)" class="w-full accent-purple-600">  
+                                    <button onclick="stepSlider('special-borderWidth', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>  
+                                </div>  
+                            </div>  
                         </div>
 
-                        <!-- Glow Color & Glow Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Glow Color</span>
-                                <input type="color" id="letters-glowColor" value="#3b82f6" oninput="updateConfig('letters', 'glowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Glow</span>
-                                    <span id="letters-glowIntensity-val" class="text-slate-500 font-mono">50%</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('letters-glowIntensity', -5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="letters-glowIntensity" min="0" max="100" value="50" oninput="updateConfig('letters', 'glowIntensity', this.value)" class="w-full accent-brand-600">
-                                    <button onclick="stepSlider('letters-glowIntensity', 5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- 2. SPECIAL KEYS CUSTOMIZATION PANEL -->
-                <div id="panel-special" class="space-y-5 hidden">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
-                            Special Keys Customization
-                        </h3>
-                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-medium">Shift, Delete, Space, Enter, ?123</span>
-                    </div>
-
-                    <!-- Key Type Switcher -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-semibold text-slate-700">Key Type</label>
-                        <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                            <button type="button" onclick="setBgMode('special', 'color')" id="special-bg-mode-color" class="py-1.5 rounded-lg text-xs font-medium bg-purple-600 text-white transition">Color</button>
-                            <button type="button" onclick="setBgMode('special', 'image')" id="special-bg-mode-image" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Image</button>
-                            <button type="button" onclick="setBgMode('special', 'animation')" id="special-bg-mode-animation" class="py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">Animation</button>
-                        </div>
-                    </div>
-
-                    <!-- Color Mode Controls -->
-                    <div id="special-ctrl-color" class="space-y-1.5">
-                        <label class="text-xs font-medium text-slate-700 flex justify-between">
-                            <span>Key Color</span>
-                            <span id="special-bgColor-val" class="text-slate-500 font-mono">#381c3b</span>
-                        </label>
-                        <div class="flex gap-2">
-                            <input type="color" id="special-bgColor" value="#381c3b" oninput="updateConfig('special', 'bgColor', this.value)" class="w-10 h-9 bg-white border border-slate-300 rounded-lg cursor-pointer shrink-0">
-                            <input type="text" id="special-bgColor-hex" value="#381c3b" oninput="updateConfig('special', 'bgColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 text-xs font-mono focus:outline-none focus:border-purple-500">
-                        </div>
-                    </div>
-
-                    <!-- Image Mode Controls -->
-                    <div id="special-ctrl-image" class="space-y-2 hidden">
-                        <label class="text-xs font-medium text-slate-700">Key Texture</label>
-                        <div class="flex items-center gap-2">
-                            <label class="flex-1 cursor-pointer bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">
-                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Image
-                                <input type="file" id="special-img-file" accept="image/png, image/jpeg, image/webp" onchange="handleFileUpload('special', 'image', this)" class="hidden">
-                            </label>
-                            <button onclick="clearMedia('special')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Image">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Animation Mode Controls -->
-                    <div id="special-ctrl-animation" class="space-y-2 hidden">
-                        <label class="text-xs font-medium text-slate-700">Key Animation</label>
-                        <div class="flex items-center gap-2">
-                            <label class="flex-1 cursor-pointer bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold py-2 px-3 rounded-lg text-center transition shadow-xs flex items-center justify-center gap-1.5">
-                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Animation
-                                <input type="file" id="special-anim-file" accept="image/gif, image/webp, video/mp4" onchange="handleFileUpload('special', 'animation', this)" class="hidden">
-                            </label>
-                            <button onclick="clearMedia('special')" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition" title="Clear Animation">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1.5 pt-1">
-                            <button onclick="setPresetAnim('special', 'rgb-wave')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-purple-500 flex items-center gap-2 font-medium">
-                                <span class="w-3 h-3 rounded-full anim-rgb-wave inline-block shrink-0"></span> RGB Wave
-                            </button>
-                            <button onclick="setPresetAnim('special', 'cyber-grid')" class="p-1.5 border border-slate-200 rounded-lg text-left text-xs bg-slate-50 hover:border-purple-500 flex items-center gap-2 font-medium">
-                                <span class="w-3 h-3 rounded-full anim-cyber-grid inline-block shrink-0"></span> Cyber Grid
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Keys Settings -->
-                    <div class="border-t border-slate-200 pt-3 space-y-3.5">
-                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Keys Settings</h4>
-
-                        <!-- Keys Text Color -->
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs">
-                                <span class="text-slate-700 font-medium">Keys Text Color</span>
-                                <span id="special-textColor-val" class="text-slate-500 font-mono">#ffffff</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <input type="color" id="special-textColor" value="#ffffff" oninput="updateConfig('special', 'textColor', this.value)" class="w-8 h-8 bg-white border border-slate-300 rounded cursor-pointer shrink-0">
-                                <input type="text" id="special-textColor-hex" value="#ffffff" oninput="updateConfig('special', 'textColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-2.5 text-xs font-mono focus:outline-none focus:border-purple-500">
-                            </div>
-                        </div>
-
-                        <!-- Icon Color -->
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs">
-                                <span class="text-slate-700 font-medium">Icon Color</span>
-                                <span id="special-iconColor-val" class="text-slate-500 font-mono">#f472b6</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <input type="color" id="special-iconColor" value="#f472b6" oninput="updateConfig('special', 'iconColor', this.value)" class="w-8 h-8 bg-white border border-slate-300 rounded cursor-pointer shrink-0">
-                                <input type="text" id="special-iconColor-hex" value="#f472b6" oninput="updateConfig('special', 'iconColor', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-2.5 text-xs font-mono focus:outline-none focus:border-purple-500">
-                            </div>
-                        </div>
-
-                        <!-- Border Color & Border Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Border Color</span>
-                                <input type="color" id="special-borderColor" value="#ec4899" oninput="updateConfig('special', 'borderColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Border</span>
-                                    <span id="special-borderWidth-val" class="text-slate-500 font-mono">1 px</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('special-borderWidth', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="special-borderWidth" min="0" max="10" value="1" oninput="updateConfig('special', 'borderWidth', this.value)" class="w-full accent-purple-600">
-                                    <button onclick="stepSlider('special-borderWidth', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stroke Color & Stroke Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Stroke Color</span>
-                                <input type="color" id="special-strokeColor" value="#f472b6" oninput="updateConfig('special', 'strokeColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Stroke</span>
-                                    <span id="special-strokeWidth-val" class="text-slate-500 font-mono">1 px</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('special-strokeWidth', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="special-strokeWidth" min="0" max="5" value="1" oninput="updateConfig('special', 'strokeWidth', this.value)" class="w-full accent-purple-600">
-                                    <button onclick="stepSlider('special-strokeWidth', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Shadow Color & Shadow Blur Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Shadow Color</span>
-                                <input type="color" id="special-shadowColor" value="#000000" oninput="updateConfig('special', 'shadowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Shadow Blur</span>
-                                    <span id="special-shadowBlur-val" class="text-slate-500 font-mono">12 px</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('special-shadowBlur', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="special-shadowBlur" min="0" max="30" value="12" oninput="updateConfig('special', 'shadowBlur', this.value)" class="w-full accent-purple-600">
-                                    <button onclick="stepSlider('special-shadowBlur', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Glow Color & Glow Slider -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <span class="text-xs text-slate-700 font-medium block">Glow Color</span>
-                                <input type="color" id="special-glowColor" value="#ec4899" oninput="updateConfig('special', 'glowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-slate-700 font-medium">Glow</span>
-                                    <span id="special-glowIntensity-val" class="text-slate-500 font-mono">50%</span>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-0.5">
-                                    <button onclick="stepSlider('special-glowIntensity', -5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>
-                                    <input type="range" id="special-glowIntensity" min="0" max="100" value="50" oninput="updateConfig('special', 'glowIntensity', this.value)" class="w-full accent-purple-600">
-                                    <button onclick="stepSlider('special-glowIntensity', 5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </aside>
-
-    </main>
-
-    <!-- EXPORT CSS MODAL -->
-    <div id="css-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white w-full max-w-lg rounded-2xl p-5 shadow-2xl border border-slate-200 flex flex-col gap-3">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="code" class="w-4 h-4 text-brand-600"></i>
-                    Exported Theme CSS
-                </h3>
-                <button onclick="closeCSSModal()" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <textarea id="css-modal-textarea" rows="10" readonly class="w-full bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-xs focus:outline-none resize-none"></textarea>
-            <div class="flex justify-end gap-2 pt-1">
-                <button onclick="closeCSSModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition">Close</button>
-                <button onclick="copyModalCSS()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-xs transition flex items-center gap-1.5">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy to Clipboard
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none z-50">
-        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-        <span id="toast-msg">Theme updated!</span>
-    </div>
-
-    <!-- MAIN APP JAVASCRIPT ENGINE -->
-    <script>
-        // State Configuration Objects
-        const defaultConfig = {
-            letters: {
-                bgMode: 'color', // 'color' | 'image' | 'animation'
-                bgColor: '#262938',
-                mediaUrl: '',
-                mediaType: '',
-                presetClass: '',
-                textColor: '#ffffff',
-                borderColor: '#3b82f6',
+                        <!-- Shadow Color & Shadow Blur Slider -->  
+                        <div class="grid grid-cols-2 gap-3">  
+                            <div class="space-y-1">  
+                                <span class="text-xs text-slate-700 font-medium block">Shadow Color</span>  
+                                <input type="color" id="special-shadowColor" value="#000000" oninput="updateConfig('special', 'shadowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">  
+                            </div>  
+                            <div class="space-y-1">  
+                                <div class="flex justify-between text-xs">  
+                                    <span class="text-slate-700 font-medium">Shadow Blur</span>  
+                                    <span id="special-shadowBlur-val" class="text-slate-500 font-mono">12 px</span>  
+                                </div>  
+                                <div class="flex items-center gap-1.5 pt-0.5">  
+                                    <button onclick="stepSlider('special-shadowBlur', -1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>  
+                                    <input type="range" id="special-shadowBlur" min="0" max="30" value="12" oninput="updateConfig('special', 'shadowBlur', this.value)" class="w-full accent-purple-600">  
+                                    <button onclick="stepSlider('special-shadowBlur', 1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>  
+                                </div>  
+                            </div>  
+                        </div>  
+  
+                        <!-- Glow Color & Glow Slider -->  
+                        <div class="grid grid-cols-2 gap-3">  
+                            <div class="space-y-1">  
+                                <span class="text-xs text-slate-700 font-medium block">Glow Color</span>  
+                                <input type="color" id="special-glowColor" value="#ec4899" oninput="updateConfig('special', 'glowColor', this.value)" class="w-full h-8 bg-white border border-slate-300 rounded cursor-pointer">  
+                            </div>  
+                            <div class="space-y-1">  
+                                <div class="flex justify-between text-xs">  
+                                    <span class="text-slate-700 font-medium">Glow</span>  
+                                    <span id="special-glowIntensity-val" class="text-slate-500 font-mono">50%</span>  
+                                </div>  
+                                <div class="flex items-center gap-1.5 pt-0.5">  
+                                    <button onclick="stepSlider('special-glowIntensity', -5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">-</button>  
+                                    <input type="range" id="special-glowIntensity" min="0" max="100" value="50" oninput="updateConfig('special', 'glowIntensity', this.value)" class="w-full accent-purple-600">  
+                                    <button onclick="stepSlider('special-glowIntensity', 5)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 flex items-center justify-center">+</button>  
+                                </div>  
+                            </div>  
+                        </div>  
+  
+                    </div>  
+                </div>  
+  
+            </div>  
+        </aside>  
+  
+    </main>  
+  
+    <!-- EXPORT CSS MODAL -->  
+    <div id="css-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">  
+        <div class="bg-white w-full max-w-lg rounded-2xl p-5 shadow-2xl border border-slate-200 flex flex-col gap-3">  
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">  
+                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">  
+                    <i data-lucide="code" class="w-4 h-4 text-brand-600"></i>  
+                    Exported Theme CSS  
+                </h3>  
+                <button onclick="closeCSSModal()" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition">  
+                    <i data-lucide="x" class="w-4 h-4"></i>  
+                </button>  
+            </div>  
+            <textarea id="css-modal-textarea" rows="10" readonly class="w-full bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-xs focus:outline-none resize-none"></textarea>  
+            <div class="flex justify-end gap-2 pt-1">  
+                <button onclick="closeCSSModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition">Close</button>  
+                <button onclick="copyModalCSS()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-xs transition flex items-center gap-1.5">  
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy to Clipboard  
+                </button>  
+            </div>  
+        </div>  
+    </div>  
+  
+    <!-- TOAST -->  
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none z-50">  
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>  
+        <span id="toast-msg">Theme updated!</span>  
+    </div>  
+  
+    <!-- MAIN APP JAVASCRIPT ENGINE -->  
+    <script>  
+        // State Configuration Objects  
+        const defaultConfig = {  
+            letters: {  
+                bgMode: 'color', // 'color' | 'image' | 'animation'  
+                bgColor: '#262938',  
+                mediaUrl: '',  
+                mediaType: '',  
+                presetClass: '',  
+                textColor: '#ffffff',  
+                borderColor: '#3b82f6',  
                 borderWidth: 1,
-                strokeColor: '#38bdf8',
-                strokeWidth: 1,
-                shadowColor: '#000000',
-                shadowBlur: 12,
-                glowColor: '#3b82f6',
-                glowIntensity: 50
-            },
-            special: {
-                bgMode: 'color',
-                bgColor: '#381c3b',
-                mediaUrl: '',
-                mediaType: '',
-                presetClass: '',
-                textColor: '#ffffff',
-                iconColor: '#f472b6',
-                borderColor: '#ec4899',
+                shadowColor: '#000000',  
+                shadowBlur: 12,  
+                glowColor: '#3b82f6',  
+                glowIntensity: 50  
+            },  
+            special: {  
+                bgMode: 'color',  
+                bgColor: '#381c3b',  
+                mediaUrl: '',  
+                mediaType: '',  
+                presetClass: '',  
+                textColor: '#ffffff',  
+                iconColor: '#f472b6',  
+                borderColor: '#ec4899',  
                 borderWidth: 1,
-                strokeColor: '#f472b6',
-                strokeWidth: 1,
-                shadowColor: '#000000',
-                shadowBlur: 12,
-                glowColor: '#ec4899',
-                glowIntensity: 50
-            }
-        };
-
-        let config = JSON.parse(JSON.stringify(defaultConfig));
-        let isCaps = false;
-        let isPreviewVisible = true;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            applyAllStyles();
-            setupInteractiveEvents();
-        });
-
-        // Toggle Keyboard Preview
-        function toggleKeyboardPreview() {
-            isPreviewVisible = !isPreviewVisible;
-            const container = document.getElementById('keyboard-preview-container');
-            if (isPreviewVisible) {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
-        }
-
-        // Tab Navigation
-        function switchTab(tab) {
-            const lettersBtn = document.getElementById('tab-btn-letters');
-            const specialBtn = document.getElementById('tab-btn-special');
-            const lettersPanel = document.getElementById('panel-letters');
-            const specialPanel = document.getElementById('panel-special');
-
-            if (tab === 'letters') {
-                lettersBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-brand-600 text-white shadow-sm transition";
-                specialBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
-                lettersPanel.classList.remove('hidden');
-                specialPanel.classList.add('hidden');
-            } else {
-                specialBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-purple-600 text-white shadow-sm transition";
-                lettersBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
-                specialPanel.classList.remove('hidden');
-                lettersPanel.classList.add('hidden');
-            }
-        }
-
-        // Key Type Visibility Engine
-        function setBgMode(target, mode) {
-            config[target].bgMode = mode;
-
-            const activeBg = target === 'letters' ? 'bg-brand-600' : 'bg-purple-600';
-            ['color', 'image', 'animation'].forEach(m => {
-                const btn = document.getElementById(`${target}-bg-mode-${m}`);
-                if (m === mode) {
-                    btn.className = `py-1.5 rounded-lg text-xs font-medium ${activeBg} text-white transition`;
-                } else {
-                    btn.className = `py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition`;
-                }
-            });
-
-            // Toggle visibility according to selected background mode
-            document.getElementById(`${target}-ctrl-color`).classList.toggle('hidden', mode !== 'color');
-            document.getElementById(`${target}-ctrl-image`).classList.toggle('hidden', mode !== 'image');
-            document.getElementById(`${target}-ctrl-animation`).classList.toggle('hidden', mode !== 'animation');
-
-            applyStylesForCategory(target);
-        }
-
-        // Stepper Control for Slider (- / +)
-        function stepSlider(id, step) {
-            const slider = document.getElementById(id);
-            if (!slider) return;
-            let val = parseInt(slider.value, 10) + step;
-            if (val < parseInt(slider.min)) val = parseInt(slider.min);
-            if (val > parseInt(slider.max)) val = parseInt(slider.max);
-            slider.value = val;
-            
-            const parts = id.split('-');
-            updateConfig(parts[0], parts[1], val);
-        }
-
-        function updateConfig(target, key, value) {
-            config[target][key] = value;
-
-            const valLabel = document.getElementById(`${target}-${key}-val`);
-            if (valLabel) {
-                if (key.includes('Width') || key.includes('Blur')) valLabel.innerText = `${value} px`;
-                else if (key.includes('Intensity')) valLabel.innerText = `${value}%`;
-                else valLabel.innerText = value;
-            }
-
-            const hexInput = document.getElementById(`${target}-${key}-hex`);
-            if (hexInput && hexInput !== document.activeElement) hexInput.value = value;
-            
-            const colorPicker = document.getElementById(`${target}-${key}`);
-            if (colorPicker && colorPicker !== document.activeElement && colorPicker.type === 'color') colorPicker.value = value;
-
-            applyStylesForCategory(target);
-        }
-
-        function handleFileUpload(target, mode, input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const url = URL.createObjectURL(file);
-                
-                config[target].mediaUrl = url;
-                config[target].mediaType = file.type.startsWith('video') ? 'video' : 'image';
-                config[target].presetClass = '';
-
-                showToast(`Custom ${mode} uploaded!`);
-                applyStylesForCategory(target);
-            }
-        }
-
-        function setPresetAnim(target, animName) {
-            config[target].presetClass = `anim-${animName}`;
-            config[target].mediaUrl = '';
-            showToast(`Applied preset animation: ${animName}`);
-            applyStylesForCategory(target);
-        }
-
-        function clearMedia(target) {
-            config[target].mediaUrl = '';
-            config[target].presetClass = '';
-            const fileInputImg = document.getElementById(`${target}-img-file`);
-            const fileInputAnim = document.getElementById(`${target}-anim-file`);
-            if (fileInputImg) fileInputImg.value = '';
-            if (fileInputAnim) fileInputAnim.value = '';
-
-            showToast('Cleared custom media');
-            applyStylesForCategory(target);
-        }
-
-        function applyAllStyles() {
-            applyStylesForCategory('letters');
-            applyStylesForCategory('special');
-        }
-
-        function applyStylesForCategory(category) {
-            const c = config[category];
-            const selector = category === 'letters' ? '.key-letter' : '.key-special';
-            const keys = document.querySelectorAll(selector);
-
-            keys.forEach(key => {
-                key.className = key.className.replace(/anim-\S+/g, '');
-                key.style.backgroundColor = '';
-                key.style.backgroundImage = '';
-
-                const existingVideo = key.querySelector('.key-bg-video');
-                if (existingVideo) existingVideo.remove();
-
-                // 1. Background Engine
-                if (c.bgMode === 'color') {
-                    key.style.backgroundColor = c.bgColor;
-                } else if (c.bgMode === 'image' || c.bgMode === 'animation') {
-                    if (c.presetClass) {
-                        key.classList.add(c.presetClass);
-                    } else if (c.mediaUrl) {
-                        if (c.mediaType === 'video') {
-                            const video = document.createElement('video');
-                            video.src = c.mediaUrl;
-                            video.autoplay = true;
-                            video.loop = true;
-                            video.muted = true;
-                            video.playsInline = true;
-                            video.className = 'key-bg-video';
-                            key.prepend(video);
-                        } else {
-                            key.style.backgroundImage = `url('${c.mediaUrl}')`;
-                        }
-                    } else {
-                        key.style.backgroundColor = c.bgColor;
-                    }
-                }
-
-                // 2. Text & Icon Colors
-                key.style.color = c.textColor;
-                if (category === 'special') {
-                    const icons = key.querySelectorAll('.special-icon');
-                    icons.forEach(ic => ic.style.color = c.iconColor);
-                }
-
-                // 3. Border & Stroke
-                key.style.borderStyle = 'solid';
-                key.style.borderColor = c.borderColor;
-                key.style.borderWidth = `${c.borderWidth}px`;
-                key.style.webkitTextStroke = `${c.strokeWidth}px ${c.strokeColor}`;
-
-                // 4. Shadow & Glow Effects
-                const glowAlpha = c.glowIntensity / 100;
-                const glowRgba = hexToRgba(c.glowColor, glowAlpha);
-                key.style.boxShadow = `0px 3px ${c.shadowBlur}px ${c.shadowColor}, 0px 0px ${c.glowIntensity / 2}px ${glowRgba}`;
-            });
-        }
-
-        function hexToRgba(hex, alpha) {
-            let c = hex.replace('#', '');
-            if (c.length === 3) c = c.split('').map(x => x + x).join('');
-            const num = parseInt(c, 16);
-            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
-        }
-
-        function setupInteractiveEvents() {
-            document.querySelectorAll('.android-key').forEach(key => {
-                key.addEventListener('click', () => {
-                    const keyValue = key.getAttribute('data-key');
-                    handleKeyPress(keyValue);
-                    triggerKeyVisualPress(key);
-                });
-            });
-
-            window.addEventListener('keydown', (e) => {
-                let keyStr = e.key;
-
-                if (e.code === 'CapsLock') {
-                    isCaps = !isCaps;
-                    updateCapsIndicator();
-                }
-
-                let keyBtn = document.querySelector(`.android-key[data-key="${keyStr}"]`) || 
-                             document.querySelector(`.android-key[data-key="${keyStr.toLowerCase()}"]`);
-
-                if (e.code === 'Space') keyBtn = document.querySelector('.android-key[data-key=" "]');
-                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keyBtn = document.querySelector('.android-key[data-key="Shift"]');
-                if (e.code === 'Backspace') keyBtn = document.querySelector('.android-key[data-key="Backspace"]');
-
-                if (keyBtn) {
-                    triggerKeyVisualPress(keyBtn);
-                }
-            });
-        }
-
-        function handleKeyPress(key) {
-            const box = document.getElementById('live-typing-box');
-            if (key === 'Backspace') {
-                box.value = box.value.slice(0, -1);
-            } else if (key === 'Enter') {
-                box.value += '\n';
-            } else if (key === 'Shift') {
-                isCaps = !isCaps;
-                updateCapsIndicator();
-            } else if (key === ' ' || key === 'EN') {
-                box.value += ' ';
-            } else if (['?123', 'Emoji'].includes(key)) {
-                // Toolbar or layer key
-            } else {
-                box.value += isCaps ? key.toUpperCase() : key.toLowerCase();
-            }
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function triggerKeyVisualPress(keyEl) {
-            keyEl.classList.add('key-pressed');
-            setTimeout(() => keyEl.classList.remove('key-pressed'), 120);
-        }
-
-        function updateCapsIndicator() {
-            const ind = document.getElementById('caps-indicator');
-            if (isCaps) {
-                ind.innerText = 'CAPS ON';
-                ind.className = 'px-2 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-mono border border-amber-300 font-bold';
-            } else {
-                ind.innerText = 'CAPS OFF';
-                ind.className = 'px-2 py-0.5 rounded bg-white text-slate-500 text-[10px] font-mono border border-slate-200 shadow-2xs';
-            }
-        }
-
-        function clearTypingBox() {
-            document.getElementById('live-typing-box').value = '';
-        }
-
-        function resetToDefaults() {
-            config = JSON.parse(JSON.stringify(defaultConfig));
-            ['letters', 'special'].forEach(cat => {
-                setBgMode(cat, 'color');
-                clearMedia(cat);
-                
-                Object.keys(config[cat]).forEach(prop => {
-                    const val = config[cat][prop];
-                    const input = document.getElementById(`${cat}-${prop}`);
-                    if (input) input.value = val;
-                    const hex = document.getElementById(`${cat}-${prop}-hex`);
-                    if (hex) hex.value = val;
-                    const label = document.getElementById(`${cat}-${prop}-val`);
-                    if (label) {
-                        if (prop.includes('Width') || prop.includes('Blur')) label.innerText = `${val} px`;
-                        else if (prop.includes('Intensity')) label.innerText = `${val}%`;
-                        else label.innerText = val;
-                    }
-                });
-            });
-
-            applyAllStyles();
-            showToast('Reset to default theme');
-        }
-
-        function copyCSSVariables() {
-            const css = generateCSSString();
-            document.getElementById('css-modal-textarea').value = css;
-            document.getElementById('css-modal').classList.remove('hidden');
-        }
-
-        function closeCSSModal() {
-            document.getElementById('css-modal').classList.add('hidden');
-        }
-
-        function copyModalCSS() {
-            const textarea = document.getElementById('css-modal-textarea');
-            textarea.select();
-            document.execCommand('copy');
-            showToast('CSS copied to clipboard!');
-            closeCSSModal();
-        }
-
-        function generateCSSString() {
-            return `/* VP Keyboard Theme Engine Output */
-.letter-key {
-  background-color: ${config.letters.bgColor};
-  color: ${config.letters.textColor};
-  border: ${config.letters.borderWidth}px solid ${config.letters.borderColor};
-  -webkit-text-stroke: ${config.letters.strokeWidth}px ${config.letters.strokeColor};
-  box-shadow: 0px 3px ${config.letters.shadowBlur}px ${config.letters.shadowColor};
-}
-
-.special-key {
-  background-color: ${config.special.bgColor};
-  color: ${config.special.textColor};
-  border: ${config.special.borderWidth}px solid ${config.special.borderColor};
-  -webkit-text-stroke: ${config.special.strokeWidth}px ${config.special.strokeColor};
-  box-shadow: 0px 3px ${config.special.shadowBlur}px ${config.special.shadowColor};
-}
-
-.special-key .icon {
-  color: ${config.special.iconColor};
-}`;
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'pointer-events-none');
-            }, 2200);
-        }
-    </script>
-</body>
+                shadowColor: '#000000',  
+                shadowBlur: 12,  
+                glowColor: '#ec4899',  
+                glowIntensity: 50  
+            }  
+        };  
+  
+        let config = JSON.parse(JSON.stringify(defaultConfig));  
+        let isCaps = false;  
+        let isPreviewVisible = true;  
+  
+        window.addEventListener('DOMContentLoaded', () => {  
+            lucide.createIcons();  
+            applyAllStyles();  
+            setupInteractiveEvents();  
+        });  
+  
+        // Toggle Keyboard Preview  
+        function toggleKeyboardPreview() {  
+            isPreviewVisible = !isPreviewVisible;  
+            const container = document.getElementById('keyboard-preview-container');  
+            if (isPreviewVisible) {  
+                container.classList.remove('hidden');  
+            } else {  
+                container.classList.add('hidden');  
+            }  
+        }  
+  
+        // Tab Navigation  
+        function switchTab(tab) {  
+            const lettersBtn = document.getElementById('tab-btn-letters');  
+            const specialBtn = document.getElementById('tab-btn-special');  
+            const lettersPanel = document.getElementById('panel-letters');  
+            const specialPanel = document.getElementById('panel-special');  
+  
+            if (tab === 'letters') {  
+                lettersBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-brand-600 text-white shadow-sm transition";  
+                specialBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300 transition";  
+                lettersPanel.classList.remove('hidden');  
+                specialPanel.classList.add('hidden');  
+            } else {  
+                specialBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-purple-600 text-white shadow-sm transition";  
+                lettersBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300 transition";  
+                specialPanel.classList.remove('hidden');  
+                lettersPanel.classList.add('hidden');  
+            }  
+        }  
+  
+        // Key Type Visibility Engine  
+        function setBgMode(target, mode) {  
+            config[target].bgMode = mode;  
+  
+            const activeBg = target === 'letters' ? 'bg-brand-600' : 'bg-purple-600';  
+            ['color', 'image', 'animation'].forEach(m => {  
+                const btn = document.getElementById(`${target}-bg-mode-${m}`);  
+                if (m === mode) {  
+                    btn.className = `py-1.5 rounded-lg text-xs font-medium ${activeBg} text-white transition`;  
+                } else {  
+                    btn.className = `py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition`;  
+                }  
+            });  
+  
+            // Toggle visibility according to selected background mode  
+            document.getElementById(`${target}-ctrl-color`).classList.toggle('hidden', mode !== 'color');  
+            document.getElementById(`${target}-ctrl-image`).classList.toggle('hidden', mode !== 'image');  
+            document.getElementById(`${target}-ctrl-animation`).classList.toggle('hidden', mode !== 'animation');  
+  
+            applyStylesForCategory(target);  
+        }  
+  
+        // Stepper Control for Slider (- / +)  
+        function stepSlider(id, step) {  
+            const slider = document.getElementById(id);  
+            if (!slider) return;  
+            let val = parseInt(slider.value, 10) + step;  
+            if (val < parseInt(slider.min)) val = parseInt(slider.min);  
+            if (val > parseInt(slider.max)) val = parseInt(slider.max);  
+            slider.value = val;  
+              
+            const parts = id.split('-');  
+            updateConfig(parts[0], parts[1], val);  
+        }  
+  
+        function updateConfig(target, key, value) {  
+            config[target][key] = value;  
+  
+            const valLabel = document.getElementById(`${target}-${key}-val`);  
+            if (valLabel) {  
+                if (key.includes('Width') || key.includes('Blur')) valLabel.innerText = `${value} px`;  
+                else if (key.includes('Intensity')) valLabel.innerText = `${value}%`;  
+                else valLabel.innerText = value;  
+            }  
+  
+            const hexInput = document.getElementById(`${target}-${key}-hex`);  
+            if (hexInput && hexInput !== document.activeElement) hexInput.value = value;  
+              
+            const colorPicker = document.getElementById(`${target}-${key}`);  
+            if (colorPicker && colorPicker !== document.activeElement && colorPicker.type === 'color') colorPicker.value = value;  
+  
+            applyStylesForCategory(target);  
+        }  
+  
+        function handleFileUpload(target, mode, input) {  
+            if (input.files && input.files[0]) {  
+                const file = input.files[0];  
+                const url = URL.createObjectURL(file);  
+                  
+                config[target].mediaUrl = url;  
+                config[target].mediaType = file.type.startsWith('video') ? 'video' : 'image';  
+                config[target].presetClass = '';  
+  
+                showToast(`Custom ${mode} uploaded!`);  
+                applyStylesForCategory(target);  
+            }  
+        }  
+  
+        function setPresetAnim(target, animName) {  
+            config[target].presetClass = `anim-${animName}`;  
+            config[target].mediaUrl = '';  
+            showToast(`Applied preset animation: ${animName}`);  
+            applyStylesForCategory(target);  
+        }  
+  
+        function clearMedia(target) {  
+            config[target].mediaUrl = '';  
+            config[target].presetClass = '';  
+            const fileInputImg = document.getElementById(`${target}-img-file`);  
+            const fileInputAnim = document.getElementById(`${target}-anim-file`);  
+            if (fileInputImg) fileInputImg.value = '';  
+            if (fileInputAnim) fileInputAnim.value = '';  
+  
+            showToast('Cleared custom media');  
+            applyStylesForCategory(target);  
+        }  
+  
+        function applyAllStyles() {  
+            applyStylesForCategory('letters');  
+            applyStylesForCategory('special');  
+        }  
+  
+        function applyStylesForCategory(category) {  
+            const c = config[category];  
+            const selector = category === 'letters' ? '.key-letter' : '.key-special';  
+            const keys = document.querySelectorAll(selector);  
+  
+            keys.forEach(key => {  
+                key.className = key.className.replace(/anim-\S+/g, '');  
+                key.style.backgroundColor = '';  
+                key.style.backgroundImage = '';  
+  
+                const existingVideo = key.querySelector('.key-bg-video');  
+                if (existingVideo) existingVideo.remove();  
+  
+                // 1. Background Engine  
+                if (c.bgMode === 'color') {  
+                    key.style.backgroundColor = c.bgColor;  
+                } else if (c.bgMode === 'image' || c.bgMode === 'animation') {  
+                    if (c.presetClass) {  
+                        key.classList.add(c.presetClass);  
+                    } else if (c.mediaUrl) {  
+                        if (c.mediaType === 'video') {  
+                            const video = document.createElement('video');  
+                            video.src = c.mediaUrl;  
+                            video.autoplay = true;  
+                            video.loop = true;  
+                            video.muted = true;  
+                            video.playsInline = true;  
+                            video.className = 'key-bg-video';  
+                            key.prepend(video);  
+                        } else {  
+                            key.style.backgroundImage = `url('${c.mediaUrl}')`;  
+                        }  
+                    } else {  
+                        key.style.backgroundColor = c.bgColor;  
+                    }  
+                }  
+  
+                // 2. Text & Icon Colors  
+                key.style.color = c.textColor;  
+                if (category === 'special') {  
+                    const icons = key.querySelectorAll('.special-icon');  
+                    icons.forEach(ic => ic.style.color = c.iconColor);  
+                }  
+  
+                // 3. Border  
+                key.style.borderStyle = 'solid';  
+                key.style.borderColor = c.borderColor;  
+                key.style.borderWidth = `${c.borderWidth}px`;  
+  
+                // 4. Shadow & Glow Effects  
+                const glowAlpha = c.glowIntensity / 100;  
+                const glowRgba = hexToRgba(c.glowColor, glowAlpha);  
+                key.style.boxShadow = `0px 3px ${c.shadowBlur}px ${c.shadowColor}, 0px 0px ${c.glowIntensity / 2}px ${glowRgba}`;  
+            });  
+        }  
+  
+        function hexToRgba(hex, alpha) {  
+            let c = hex.replace('#', '');  
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');  
+            const num = parseInt(c, 16);  
+            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;  
+        }  
+  
+        function setupInteractiveEvents() {  
+            document.querySelectorAll('.android-key').forEach(key => {  
+                key.addEventListener('click', () => {  
+                    const keyValue = key.getAttribute('data-key');  
+                    handleKeyPress(keyValue);  
+                    triggerKeyVisualPress(key);  
+                });  
+            });  
+  
+            window.addEventListener('keydown', (e) => {  
+                let keyStr = e.key;  
+  
+                if (e.code === 'CapsLock') {  
+                    isCaps = !isCaps;  
+                    updateCapsIndicator();  
+                }  
+  
+                let keyBtn = document.querySelector(`.android-key[data-key="${keyStr}"]`) ||   
+                             document.querySelector(`.android-key[data-key="${keyStr.toLowerCase()}"]`);  
+  
+                if (e.code === 'Space') keyBtn = document.querySelector('.android-key[data-key=" "]');  
+                if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keyBtn = document.querySelector('.android-key[data-key="Shift"]');  
+                if (e.code === 'Backspace') keyBtn = document.querySelector('.android-key[data-key="Backspace"]');  
+  
+                if (keyBtn) {  
+                    triggerKeyVisualPress(keyBtn);  
+                }  
+            });  
+        }  
+  
+        function handleKeyPress(key) {  
+            const box = document.getElementById('live-typing-box');  
+            if (key === 'Backspace') {  
+                box.value = box.value.slice(0, -1);  
+            } else if (key === 'Enter') {  
+                box.value += '\n';  
+            } else if (key === 'Shift') {  
+                isCaps = !isCaps;  
+                updateCapsIndicator();  
+            } else if (key === ' ' || key === 'EN') {  
+                box.value += ' ';  
+            } else if (['?123', 'Emoji'].includes(key)) {  
+                // Toolbar or layer key  
+            } else {  
+                box.value += isCaps ? key.toUpperCase() : key.toLowerCase();  
+            }  
+            box.scrollTop = box.scrollHeight;  
+        }  
+  
+        function triggerKeyVisualPress(keyEl) {  
+            keyEl.classList.add('key-pressed');  
+            setTimeout(() => keyEl.classList.remove('key-pressed'), 120);  
+        }  
+  
+        function updateCapsIndicator() {  
+            const ind = document.getElementById('caps-indicator');  
+            if (isCaps) {  
+                ind.innerText = 'CAPS ON';  
+                ind.className = 'px-2 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-mono border border-amber-300 font-bold';  
+            } else {  
+                ind.innerText = 'CAPS OFF';  
+                ind.className = 'px-2 py-0.5 rounded bg-white text-slate-500 text-[10px] font-mono border border-slate-200 shadow-2xs';  
+            }  
+        }  
+  
+        function clearTypingBox() {  
+            document.getElementById('live-typing-box').value = '';  
+        }  
+  
+        function resetToDefaults() {  
+            config = JSON.parse(JSON.stringify(defaultConfig));  
+            ['letters', 'special'].forEach(cat => {  
+                setBgMode(cat, 'color');  
+                clearMedia(cat);  
+                  
+                Object.keys(config[cat]).forEach(prop => {  
+                    const val = config[cat][prop];  
+                    const input = document.getElementById(`${cat}-${prop}`);  
+                    if (input) input.value = val;  
+                    const hex = document.getElementById(`${cat}-${prop}-hex`);  
+                    if (hex) hex.value = val;  
+                    const label = document.getElementById(`${cat}-${prop}-val`);  
+                    if (label) {  
+                        if (prop.includes('Width') || prop.includes('Blur')) label.innerText = `${val} px`;  
+                        else if (prop.includes('Intensity')) label.innerText = `${val}%`;  
+                        else label.innerText = val;  
+                    }  
+                });  
+            });  
+  
+            applyAllStyles();  
+            showToast('Reset to default theme');  
+        }  
+  
+        function copyCSSVariables() {  
+            const css = generateCSSString();  
+            document.getElementById('css-modal-textarea').value = css;  
+            document.getElementById('css-modal').classList.remove('hidden');  
+        }  
+  
+        function closeCSSModal() {  
+            document.getElementById('css-modal').classList.add('hidden');  
+        }  
+  
+        function copyModalCSS() {  
+            const textarea = document.getElementById('css-modal-textarea');  
+            textarea.select();  
+            document.execCommand('copy');  
+            showToast('CSS copied to clipboard!');  
+            closeCSSModal();  
+        }  
+  
+        function generateCSSString() {  
+            return `/* VP Keyboard Theme Engine Output */  
+.letter-key {  
+  background-color: ${config.letters.bgColor};  
+  color: ${config.letters.textColor};  
+  border: ${config.letters.borderWidth}px solid ${config.letters.borderColor};  
+  box-shadow: 0px 3px ${config.letters.shadowBlur}px ${config.letters.shadowColor};  
+}  
+  
+.special-key {  
+  background-color: ${config.special.bgColor};  
+  color: ${config.special.textColor};  
+  border: ${config.special.borderWidth}px solid ${config.special.borderColor};  
+  box-shadow: 0px 3px ${config.special.shadowBlur}px ${config.special.shadowColor};  
+}  
+  
+.special-key .icon {  
+  color: ${config.special.iconColor};  
+}`;  
+        }  
+  
+        function showToast(msg) {  
+            const toast = document.getElementById('toast');  
+            document.getElementById('toast-msg').innerText = msg;  
+            toast.classList.remove('opacity-0', 'pointer-events-none');  
+            setTimeout(() => {  
+                toast.classList.add('opacity-0', 'pointer-events-none');  
+            }, 2200);  
+        }  
+    </script>  
+</body>  
 </html>
-```
