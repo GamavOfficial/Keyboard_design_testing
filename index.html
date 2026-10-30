@@ -306,22 +306,6 @@
                         <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-medium">A-Z, 0-9</span>  
                     </div>  
   
-                    <!-- Select an individual special key to customize it independently -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-semibold text-slate-700">Select Special Key</label>
-                        <div id="special-key-selector" class="grid grid-cols-4 gap-1.5">
-                            <button type="button" data-special-key="Shift" onclick="selectSpecialKey('Shift')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-purple-600 text-white">⇧ Shift</button>
-                            <button type="button" data-special-key="?123" onclick="selectSpecialKey('?123')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">?123</button>
-                            <button type="button" data-special-key="Emoji" onclick="selectSpecialKey('Emoji')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Emoji</button>
-                            <button type="button" data-special-key="," onclick="selectSpecialKey(',')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">, Comma</button>
-                            <button type="button" data-special-key=" " onclick="selectSpecialKey(' ')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Space</button>
-                            <button type="button" data-special-key="." onclick="selectSpecialKey('.')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">. Period</button>
-                            <button type="button" data-special-key="Backspace" onclick="selectSpecialKey('Backspace')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">⌫ Delete</button>
-                            <button type="button" data-special-key="Enter" onclick="selectSpecialKey('Enter')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">↵ Enter</button>
-                        </div>
-                        <p class="text-[10px] text-slate-500">Settings below apply only to the selected key.</p>
-                    </div>
-
                     <!-- Key Type Switcher -->  
                     <div class="space-y-1.5">  
                         <label class="text-xs font-semibold text-slate-700">Key Type</label>  
@@ -465,6 +449,23 @@
                         </h3>  
                         <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-medium">Shift, Delete, Space, Enter, ?123</span>  
                     </div>  
+
+                    <!-- Select an individual special key to customize it independently -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold text-slate-700">Select Special Key</label>
+                        <div id="special-key-selector" class="grid grid-cols-4 gap-1.5">
+                            <button type="button" data-special-key="Shift" onclick="selectSpecialKey('Shift')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-purple-600 text-white">⇧ Shift</button>
+                            <button type="button" data-special-key="?123" onclick="selectSpecialKey('?123')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">?123</button>
+                            <button type="button" data-special-key="Emoji" onclick="selectSpecialKey('Emoji')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Emoji</button>
+                            <button type="button" data-special-key="," onclick="selectSpecialKey(',')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">, Comma</button>
+                            <button type="button" data-special-key=" " onclick="selectSpecialKey(' ')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Space</button>
+                            <button type="button" data-special-key="." onclick="selectSpecialKey('.')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">. Period</button>
+                            <button type="button" data-special-key="Backspace" onclick="selectSpecialKey('Backspace')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">⌫ Delete</button>
+                            <button type="button" data-special-key="Enter" onclick="selectSpecialKey('Enter')" class="special-key-select px-2 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">↵ Enter</button>
+                        </div>
+                        <p class="text-[10px] text-slate-500">Settings below apply only to the selected key.</p>
+                    </div>
+
   
                     <!-- Key Type Switcher -->  
                     <div class="space-y-1.5">  
